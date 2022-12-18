@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/go-training/bankingapp/dbutil"
+	"github.com/chauhansantosh/go-training/bankingapp/dbutil"
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/chauhansantosh/go-training/bankingapp/bankaccount"
+	"github.com/chauhansantosh/go-training/bankingapp/bankaccount/bankaccounthandler"
+	"github.com/chauhansantosh/go-training/bankingapp/customer"
+	"github.com/chauhansantosh/go-training/bankingapp/customer/customerhandler"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/go-training/bankingapp/bankaccount"
-	"github.com/go-training/bankingapp/bankaccount/bankaccounthandler"
-	"github.com/go-training/bankingapp/customer"
-	"github.com/go-training/bankingapp/customer/customerhandler"
 )
 
 func main() {

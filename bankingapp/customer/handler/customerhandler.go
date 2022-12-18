@@ -2,16 +2,14 @@ package customerhandler
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
 
+	"github.com/chauhansantosh/go-training/bankingapp/customer"
+	"github.com/chauhansantosh/go-training/bankingapp/dbutil"
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
-	"github.com/go-training/bankingapp/customer"
-	"github.com/go-training/bankingapp/dbutil"
 )
 
 var start time.Time
@@ -27,18 +25,15 @@ func CreateCustomer(c *gin.Context) {
 		return
 	}
 
-	v := validator.New()
-	err := v.Struct(customer)
-
-	if err != nil {
-		for _, e := range err.(validator.ValidationErrors) {
-			errorRespList = constructErrorResponse(fmt.Sprint(e), "1002", errorRespList)
+	if errors, err := util.validateRequest(c, customer); err != nil {
+		for _, e := range errors {
+			errorRespList = constructErrorResponse(e, "1002", errorRespList)
 		}
 		constructResponse(http.StatusBadRequest, true, &errorRespList, c, nil)
 		return
 	}
 
-	_, err = dbutil.InsertCustomer(customer)
+	_, err := dbutil.InsertCustomer(customer)
 	switch err {
 	case nil:
 		constructResponse(http.StatusOK, false, nil, c, &customer)

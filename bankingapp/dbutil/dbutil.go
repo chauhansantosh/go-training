@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-training/bankingapp/bankaccount"
-	"github.com/go-training/bankingapp/customer"
+	"github.com/chauhansantosh/go-training/bankingapp/bankaccount"
+	"github.com/chauhansantosh/go-training/bankingapp/customer"
 )
 
 const (

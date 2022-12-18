@@ -9,10 +9,10 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/chauhansantosh/go-training/bankingapp/bankaccount"
+	"github.com/chauhansantosh/go-training/bankingapp/dbutil"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/go-training/bankingapp/bankaccount"
-	"github.com/go-training/bankingapp/dbutil"
 )
 
 var start time.Time
