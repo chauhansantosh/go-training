@@ -6,9 +6,12 @@ import (
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 	en_translations "github.com/go-playground/validator/v10/translations/en"
+	"reflect"
+	"strings"
+	"fmt"
 )
 
-func validateRequest(c *gin.Context, reqObj customer.Customer) (errorList []string, err error) {
+func ValidateRequest(c *gin.Context, reqObj interface{}) (errorList []string, err error) {
 	var errorlist []string
 	v := validator.New()
 

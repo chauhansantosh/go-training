@@ -9,6 +9,7 @@ import (
 
 	"github.com/chauhansantosh/go-training/bankingapp/customer"
 	"github.com/chauhansantosh/go-training/bankingapp/dbutil"
+	"github.com/chauhansantosh/go-training/bankingapp/util"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,7 +26,7 @@ func CreateCustomer(c *gin.Context) {
 		return
 	}
 
-	if errors, err := util.validateRequest(c, customer); err != nil {
+	if errors, err := util.ValidateRequest(c, customer); err != nil {
 		for _, e := range errors {
 			errorRespList = constructErrorResponse(e, "1002", errorRespList)
 		}

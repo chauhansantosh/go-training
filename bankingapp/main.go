@@ -9,9 +9,9 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/chauhansantosh/go-training/bankingapp/bankaccount"
-	"github.com/chauhansantosh/go-training/bankingapp/bankaccount/bankaccounthandler"
+	bankaccounthandler "github.com/chauhansantosh/go-training/bankingapp/bankaccount/handler"
 	"github.com/chauhansantosh/go-training/bankingapp/customer"
-	"github.com/chauhansantosh/go-training/bankingapp/customer/customerhandler"
+	customerhandler "github.com/chauhansantosh/go-training/bankingapp/customer/handler"
 	_ "github.com/go-sql-driver/mysql"
 )
 
