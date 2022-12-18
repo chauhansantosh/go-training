@@ -10,6 +10,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-training/bankingapp/bankaccount"
+	"github.com/go-training/bankingapp/bankaccount/bankaccounthandler"
 	"github.com/go-training/bankingapp/customer"
 	"github.com/go-training/bankingapp/customer/customerhandler"
 )
@@ -21,12 +22,13 @@ func main() {
 		log.Printf("Error %s when getting db connection", err)
 		return
 	}
+	dbutil.DB = db
 	defer db.Close()
 	log.Printf("Successfully connected to database")
 
-	err = dbutil.CreateTables(db)
+	err = dbutil.CreateTables()
 	if err != nil {
-		log.Printf("Create product table failed with error %s", err)
+		log.Printf("Create table failed with error %s", err)
 		return
 	}
 
@@ -45,7 +47,7 @@ func main() {
 
 	var account1, account2, account3 bankaccount.BankAccount
 	account1 = bankaccount.BankAccount{}
-	account1.Init(customer1, 51691852, "SAVINGS", 10000.5)
+	account1.Init(customer1.CustomerId, 51691852, "SAVINGS", 10000.5)
 	account1.BalanceCheck()
 	//err = account1.Withdraw(1000)
 	if err != nil {
@@ -53,7 +55,7 @@ func main() {
 	}
 
 	account2 = bankaccount.BankAccount{}
-	account2.Init(customer2, 51691853, "FIXED", 20000.5)
+	account2.Init(customer2.CustomerId, 51691853, "FIXED", 20000.5)
 	account2.BalanceCheck()
 	//account2.Deposit(5000)
 	//err = account2.Withdraw(10000)
@@ -62,7 +64,7 @@ func main() {
 	}
 
 	account3 = bankaccount.BankAccount{}
-	account3.Init(customer3, 51691854, "CURRENT", 30000.0)
+	account3.Init(customer3.CustomerId, 51691854, "CURRENT", 30000.0)
 	account3.BalanceCheck()
 	//err = account3.Withdraw(5000)
 	if err != nil {
@@ -87,7 +89,14 @@ func main() {
 
 	router := gin.Default()
 	router.GET("/customers", customerhandler.GetCustomers)
+	router.GET("/customers/:customerId", customerhandler.GetCustomerById)
 	router.PUT("/customer", customerhandler.CreateCustomer)
+
+	router.GET("/accounts", bankaccounthandler.GetAccounts)
+	router.GET("/accounts/:accountId", bankaccounthandler.GetAccountById)
+	router.PUT("/account", bankaccounthandler.CreateAccount)
+	router.PUT("/accounts/:accountId/withdraw", bankaccounthandler.Withdraw)
+	router.PUT("/accounts/:accountId/deposit", bankaccounthandler.Deposit)
 
 	router.Run("localhost:8080")
 }

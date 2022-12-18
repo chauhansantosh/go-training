@@ -30,7 +30,7 @@ func ConnectDb() (*sql.DB, error) {
 
 	createDb(DB, "bankdb")
 
-	DB.Close()
+	defer DB.Close()
 	DB, err = sql.Open("mysql", dsn(dbname))
 	if err != nil {
 		log.Printf("Error %s when opening DB", err)
@@ -55,7 +55,7 @@ func ConnectDb() (*sql.DB, error) {
 }
 
 func dsn(dbName string) string {
-	return fmt.Sprintf("%s:%s@tcp(%s)/%s", username, password, hostname, dbName)
+	return fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true", username, password, hostname, dbName)
 }
 
 func createDb(db *sql.DB, dbName string) {
@@ -75,12 +75,12 @@ func createDb(db *sql.DB, dbName string) {
 	log.Printf("rows affected %d\n", rowsAffected)
 }
 
-func CreateTables(db *sql.DB) error {
+func CreateTables() error {
 	query := `CREATE TABLE IF NOT EXISTS customer(customer_id int primary key, customer_name text, 
         customer_type text, created_at datetime default CURRENT_TIMESTAMP, updated_at datetime default CURRENT_TIMESTAMP)`
 	ctx, cancelfunc := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancelfunc()
-	res, err := db.ExecContext(ctx, query)
+	res, err := DB.ExecContext(ctx, query)
 	if err != nil {
 		log.Printf("Error %s when creating table", err)
 		return err
@@ -97,7 +97,7 @@ func CreateTables(db *sql.DB) error {
             CONSTRAINT fk_customer FOREIGN KEY (customer_id) REFERENCES customer(customer_id))`
 	ctx, cancelfunc = context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancelfunc()
-	res, err = db.ExecContext(ctx, query)
+	res, err = DB.ExecContext(ctx, query)
 	if err != nil {
 		log.Printf("Error %s when creating table", err)
 		return err
@@ -111,11 +111,11 @@ func CreateTables(db *sql.DB) error {
 	return nil
 }
 
-func InsertCustomer(db *sql.DB, c customer.Customer) (customerId int64, err error) {
+func InsertCustomer(c customer.Customer) (customerId int64, err error) {
 	query := "INSERT INTO customer(customer_id, customer_name, customer_type) VALUES (?, ?, ?)"
 	ctx, cancelfunc := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancelfunc()
-	stmt, err := db.PrepareContext(ctx, query)
+	stmt, err := DB.PrepareContext(ctx, query)
 	if err != nil {
 		log.Printf("Error %s when preparing SQL statement", err)
 		return 0, err
@@ -141,17 +141,17 @@ func InsertCustomer(db *sql.DB, c customer.Customer) (customerId int64, err erro
 	return custId, nil
 }
 
-func InsertBankAccount(db *sql.DB, a bankaccount.BankAccount) error {
+func InsertBankAccount(a bankaccount.BankAccount) error {
 	query := "INSERT INTO bank_account(account_id, account_type, balance, customer_id) VALUES (?, ?, ?, ?)"
-	ctx, cancelfunc := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancelfunc := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancelfunc()
-	stmt, err := db.PrepareContext(ctx, query)
+	stmt, err := DB.PrepareContext(ctx, query)
 	if err != nil {
 		log.Printf("Error %s when preparing SQL statement", err)
 		return err
 	}
 	defer stmt.Close()
-	res, err := stmt.ExecContext(ctx, a.AccountId, a.AccountType, a.OpeningBalance, a.AccountHolder.CustomerId)
+	res, err := stmt.ExecContext(ctx, a.AccountId, a.AccountType, a.OpeningBalance, a.CustomerId)
 	if err != nil {
 		log.Printf("Error %s when inserting row into bank_account table", err)
 		return err
@@ -162,16 +162,10 @@ func InsertBankAccount(db *sql.DB, a bankaccount.BankAccount) error {
 		return err
 	}
 	log.Printf("%d bank accounts created ", rows)
-	accountId, err := res.LastInsertId()
-	if err != nil {
-		log.Printf("Error %s when getting last inserted bank account", err)
-		return err
-	}
-	log.Printf("Bank account with ID %d created", accountId)
 	return nil
 }
 
-func MultipleInsertCutomer(db *sql.DB, customers []customer.Customer) error {
+func MultipleInsertCutomer(customers []customer.Customer) error {
 	query := "INSERT INTO customer(customer_id, customer_name, customer_type) VALUES "
 	var inserts []string
 	var params []interface{}
@@ -184,7 +178,7 @@ func MultipleInsertCutomer(db *sql.DB, customers []customer.Customer) error {
 	log.Println("query is", query)
 	ctx, cancelfunc := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancelfunc()
-	stmt, err := db.PrepareContext(ctx, query)
+	stmt, err := DB.PrepareContext(ctx, query)
 	if err != nil {
 		log.Printf("Error %s when preparing SQL statement", err)
 		return err
@@ -204,20 +198,20 @@ func MultipleInsertCutomer(db *sql.DB, customers []customer.Customer) error {
 	return nil
 }
 
-func MultipleInsertBankAccount(db *sql.DB, bacnkAccounts []bankaccount.BankAccount) error {
+func MultipleInsertBankAccount(bacnkAccounts []bankaccount.BankAccount) error {
 	query := "INSERT INTO bank_account(account_id, account_type, balance, customer_id) VALUES"
 	var inserts []string
 	var params []interface{}
 	for _, v := range bacnkAccounts {
 		inserts = append(inserts, "(?, ?, ?, ?)")
-		params = append(params, v.AccountId, v.AccountType, v.OpeningBalance, v.AccountHolder.CustomerId)
+		params = append(params, v.AccountId, v.AccountType, v.OpeningBalance, v.CustomerId)
 	}
 	queryVals := strings.Join(inserts, ",")
 	query = query + queryVals
 	log.Println("query is", query)
 	ctx, cancelfunc := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancelfunc()
-	stmt, err := db.PrepareContext(ctx, query)
+	stmt, err := DB.PrepareContext(ctx, query)
 	if err != nil {
 		log.Printf("Error %s when preparing SQL statement", err)
 		return err
