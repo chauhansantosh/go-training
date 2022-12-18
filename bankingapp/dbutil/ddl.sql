@@ -23,13 +23,25 @@ CREATE TABLE `bank_account` (
   KEY `fk_customer` (`customer_id`)
 );
 
+DROP TRIGGER IF EXISTS `bankdb`.`bank_account_BEFORE_INSERT`;
+
+DELIMITER $$
+USE `bankdb`$$
 CREATE DEFINER=`root`@`localhost` TRIGGER `bank_account_BEFORE_INSERT` BEFORE INSERT ON `bank_account` FOR EACH ROW BEGIN
 	IF EXISTS (SELECT 1 FROM bank_account WHERE customer_id = NEW.customer_id AND NEW.account_type in ('SAVINGS','CURRENT')) THEN 
         SELECT CONCAT(NEW.customer_id, ' customer already have a ', NEW.account_type, ' account. Can not have more than one.') INTO @error_text; 
 		SIGNAL SQLSTATE '45000' SET message_text = @error_text; 
 	END IF;
-END
+END;$$
+DELIMITER ;
 
+
+
+
+DROP TRIGGER IF EXISTS `bankdb`.`bank_account_BEFORE_UPDATE`;
+
+DELIMITER $$
+USE `bankdb`$$
 CREATE DEFINER=`root`@`localhost` TRIGGER `bank_account_BEFORE_UPDATE` BEFORE UPDATE ON `bank_account` FOR EACH ROW BEGIN
 IF (NEW.balance - OLD.balance > 50000 AND OLD.account_type='SAVINGS' AND (NEW.account_pan IS NULL OR NEW.account_pan = '')) THEN
      SELECT CONCAT('Pan number is mandatory for depositing more than 50000.') INTO @error_text; 
@@ -38,7 +50,9 @@ elseif (NEW.balance - OLD.balance > 250000 AND OLD.account_type='CURRENT' AND (N
      SELECT CONCAT('Pan number is mandatory for depositing more than 250000.') INTO @error_text; 
 	 SIGNAL SQLSTATE '46000' SET message_text = @error_text; 
 END IF;
-END
+END$$
+DELIMITER ;
+
 
 CREATE TABLE `transaction` (
   `transaction_id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -55,3 +69,10 @@ CREATE TABLE `transaction` (
   CONSTRAINT `fk_account` FOREIGN KEY (`account_id`) REFERENCES `bank_account` (`account_id`),
   CONSTRAINT `fk_customer` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`)
 );
+
+
+ALTER TABLE customer
+ADD CONSTRAINT chk_acc_type CHECK (customer_type IN ('INDIVIDUAL','COMPANY'))
+
+ALTER TABLE bank_account
+ADD CONSTRAINT chk_limit_sv CHECK (balance < 100000 AND account_type='SAVINGS');
