@@ -8,7 +8,8 @@ CREATE TABLE `customer` (
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `customer_pan` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`customer_id`),
-  UNIQUE KEY `pan_UNIQUE` (`customer_pan`)
+  UNIQUE KEY `pan_UNIQUE` (`customer_pan`),
+  CONSTRAINT `chk_acc_type` CHECK ((`customer_type` in ('INDIVIDUAL','COMPANY')))
 );
 
 CREATE TABLE `bank_account` (
@@ -19,8 +20,14 @@ CREATE TABLE `bank_account` (
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `account_pan` varchar(10) DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT '1',
+  `is_locked` tinyint(1) DEFAULT '0',
+  `lock_period_fd` int unsigned DEFAULT NULL,
+  `penalty_fd` decimal(10,0) DEFAULT NULL,
   PRIMARY KEY (`account_id`),
-  KEY `fk_customer` (`customer_id`)
+  KEY `fk_customer` (`customer_id`),
+  CONSTRAINT `chk_account_type` CHECK ((`account_type` in ('SAVINGS','FIXED','CURRENT'))),
+  CONSTRAINT `chk_limit_sv` CHECK (((`balance` < 100000) and (`account_type` = 'SAVINGS')))
 );
 
 DROP TRIGGER IF EXISTS `bankdb`.`bank_account_BEFORE_INSERT`;
@@ -34,9 +41,6 @@ CREATE DEFINER=`root`@`localhost` TRIGGER `bank_account_BEFORE_INSERT` BEFORE IN
 	END IF;
 END;$$
 DELIMITER ;
-
-
-
 
 DROP TRIGGER IF EXISTS `bankdb`.`bank_account_BEFORE_UPDATE`;
 
@@ -71,8 +75,3 @@ CREATE TABLE `transaction` (
 );
 
 
-ALTER TABLE customer
-ADD CONSTRAINT chk_acc_type CHECK (customer_type IN ('INDIVIDUAL','COMPANY'))
-
-ALTER TABLE bank_account
-ADD CONSTRAINT chk_limit_sv CHECK (balance < 100000 AND account_type='SAVINGS');
