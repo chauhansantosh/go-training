@@ -2,67 +2,27 @@ package util
 
 import (
 	"context"
-	"database/sql"
-	"fmt"
 	"log"
 	"strings"
 	"time"
 
 	bankaccount "github.com/chauhansantosh/go-training/bankingapp/model/account"
 	customer "github.com/chauhansantosh/go-training/bankingapp/model/customer"
+	mysql "github.com/chauhansantosh/go-training/bankingapp/mysqldb"
 )
 
-const (
-	username = "root"
-	password = "India@123"
-	hostname = "127.0.0.1:3306"
-	dbname   = "bankdb"
+const(
+	GETQUERY = `SELECT account_id, customer_id, account_type, balance, 
+	created_at, updated_at, IFNULL(account_pan, ''), is_active, is_locked, IFNULL(lock_period_fd, 0), 
+	locked_until, IFNULL(penalty_fd, 0)  
+	FROM bankdb.bank_account `
 )
 
-var DB *sql.DB
-
-func ConnectDb() (*sql.DB, error) {
-	DB, err := sql.Open("mysql", dsn(""))
-	if err != nil {
-		log.Printf("Error %s when opening DB\n", err)
-		return nil, err
-	}
-
-	createDb(DB, "bankdb")
-
-	defer DB.Close()
-	DB, err = sql.Open("mysql", dsn(dbname))
-	if err != nil {
-		log.Printf("Error %s when opening DB", err)
-		return nil, err
-	}
-
-	//Setting connection pool options
-	DB.SetMaxOpenConns(20)
-	DB.SetMaxIdleConns(20)
-	DB.SetConnMaxLifetime(time.Minute * 5)
-
-	//ping created database to verify the connection
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
-	//defer cancelfunc()
-	err = DB.PingContext(ctx)
-	if err != nil {
-		log.Printf("Errors %s pinging DB", err)
-		return nil, err
-	}
-	log.Printf("Connected to DB %s successfully\n", dbname)
-	return DB, nil
-}
-
-func dsn(dbName string) string {
-	return fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true", username, password, hostname, dbName)
-}
-
-func createDb(db *sql.DB, dbName string) {
+func CreateDb(dbName string) {
 	// Create database if not exists
 	ctx, cancelfunc := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancelfunc()
-	response, err := db.ExecContext(ctx, "CREATE DATABASE IF NOT EXISTS "+dbName)
+	response, err := mysql.DB.ExecContext(ctx, "CREATE DATABASE IF NOT EXISTS "+dbName)
 	if err != nil {
 		log.Printf("Error %s when creating DB\n", err)
 		return
@@ -80,7 +40,7 @@ func CreateTables() error {
         customer_type text, created_at datetime default CURRENT_TIMESTAMP, updated_at datetime default CURRENT_TIMESTAMP)`
 	ctx, cancelfunc := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancelfunc()
-	res, err := DB.ExecContext(ctx, query)
+	res, err := mysql.DB.ExecContext(ctx, query)
 	if err != nil {
 		log.Printf("Error %s when creating table", err)
 		return err
@@ -97,7 +57,7 @@ func CreateTables() error {
             CONSTRAINT fk_customer FOREIGN KEY (customer_id) REFERENCES customer(customer_id))`
 	ctx, cancelfunc = context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancelfunc()
-	res, err = DB.ExecContext(ctx, query)
+	res, err = mysql.DB.ExecContext(ctx, query)
 	if err != nil {
 		log.Printf("Error %s when creating table", err)
 		return err
@@ -115,7 +75,7 @@ func InsertCustomer(c customer.Customer) (customerId int64, err error) {
 	query := "INSERT INTO customer(customer_id, customer_name, customer_type) VALUES (?, ?, ?)"
 	ctx, cancelfunc := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancelfunc()
-	stmt, err := DB.PrepareContext(ctx, query)
+	stmt, err := mysql.DB.PrepareContext(ctx, query)
 	if err != nil {
 		log.Printf("Error %s when preparing SQL statement", err)
 		return 0, err
@@ -142,16 +102,30 @@ func InsertCustomer(c customer.Customer) (customerId int64, err error) {
 }
 
 func InsertBankAccount(a bankaccount.BankAccount) error {
-	query := "INSERT INTO bank_account(account_id, account_type, balance, customer_id) VALUES (?, ?, ?, ?)"
+	query := `INSERT INTO bank_account(
+	account_id, account_type, balance, customer_id, account_pan, is_locked, locked_until, lock_period_fd, penalty_fd) 
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
 	ctx, cancelfunc := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancelfunc()
-	stmt, err := DB.PrepareContext(ctx, query)
+	stmt, err := mysql.DB.PrepareContext(ctx, query)
 	if err != nil {
 		log.Printf("Error %s when preparing SQL statement", err)
 		return err
 	}
 	defer stmt.Close()
-	res, err := stmt.ExecContext(ctx, a.AccountId, a.AccountType, a.OpeningBalance, a.CustomerId)
+	var penaltyFd float32	
+	if a.AccountType == "FIXED" {
+		lockedUntil := time.Now().AddDate(a.LockPeriodFd, 0, 0)
+		a.IsLocked = true
+		a.LockedUntil = &lockedUntil
+		if a.PenaltyFd > 0 {
+			penaltyFd = a.PenaltyFd
+		} else {
+			penaltyFd = 0.1
+		}
+	}
+	res, err := stmt.ExecContext(ctx, a.AccountId, a.AccountType, a.OpeningBalance, a.CustomerId,
+		a.AccountPan, a.IsLocked, a.LockedUntil, a.LockPeriodFd, penaltyFd)
 	if err != nil {
 		log.Printf("Error %s when inserting row into bank_account table", err)
 		return err
@@ -178,7 +152,7 @@ func MultipleInsertCutomer(customers []customer.Customer) error {
 	log.Println("query is", query)
 	ctx, cancelfunc := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancelfunc()
-	stmt, err := DB.PrepareContext(ctx, query)
+	stmt, err := mysql.DB.PrepareContext(ctx, query)
 	if err != nil {
 		log.Printf("Error %s when preparing SQL statement", err)
 		return err
@@ -211,7 +185,7 @@ func MultipleInsertBankAccount(bacnkAccounts []bankaccount.BankAccount) error {
 	log.Println("query is", query)
 	ctx, cancelfunc := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancelfunc()
-	stmt, err := DB.PrepareContext(ctx, query)
+	stmt, err := mysql.DB.PrepareContext(ctx, query)
 	if err != nil {
 		log.Printf("Error %s when preparing SQL statement", err)
 		return err

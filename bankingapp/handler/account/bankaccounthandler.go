@@ -2,6 +2,7 @@ package accounthandler
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 	"time"
 
 	bankaccount "github.com/chauhansantosh/go-training/bankingapp/model/account"
+	mysql "github.com/chauhansantosh/go-training/bankingapp/mysqldb"
 	"github.com/chauhansantosh/go-training/bankingapp/util"
 	"github.com/gin-gonic/gin"
 )
@@ -24,15 +26,12 @@ func GetAccounts(ctx *gin.Context) {
 	var bankAccountResponse bankaccount.BankAccount
 	customerId, _ := strconv.ParseInt(ctx.Param("customerId"), 10, 64)
 
-	query := `SELECT account_id, customer_id, account_type, balance, 
-	created_at, updated_at, IFNULL(account_pan, '')  
-	FROM bankdb.bank_account
-	WHERE (? > 0 AND customer_id = ?) OR (? = 0)`
+	query := util.GETQUERY + `WHERE (? > 0 AND customer_id = ?) OR (? = 0)`
 	fmt.Println("query ==>", query)
 
-	rows, err := util.DB.Query(query, customerId, customerId, customerId)
+	rows, err := mysql.DB.Query(query, customerId, customerId, customerId)
 	/*
-		rows, err := util.DB.Query(`SELECT account_id, customer_id, account_type, balance,
+		rows, err := mysql.DB.Query(`SELECT account_id, customer_id, account_type, balance,
 		created_at, updated_at, IFNULL(account_pan, '')  FROM bankdb.bank_account`) */
 
 	if err != nil {
@@ -49,6 +48,11 @@ func GetAccounts(ctx *gin.Context) {
 			&bankAccountResponse.CreatedAt,
 			&bankAccountResponse.UpdatedAt,
 			&bankAccountResponse.AccountPan,
+			&bankAccountResponse.IsActive,
+			&bankAccountResponse.IsLocked,
+			&bankAccountResponse.LockPeriodFd,
+			&bankAccountResponse.LockedUntil,
+			&bankAccountResponse.PenaltyFd,
 		); err != nil {
 			log.Println("Error while scanning for bankaccounts columns", err)
 			errorRespList = constructErrorResponse(err.Error(), "1002", errorRespList)
@@ -115,10 +119,7 @@ func GetAccountById(ctx *gin.Context) {
 	var bankAccountResponse bankaccount.BankAccount
 	bankAccountId, _ := strconv.ParseInt(ctx.Param("accountId"), 10, 64)
 
-	rows := util.DB.QueryRow(`SELECT 
-	account_id, customer_id, account_type, balance, created_at, updated_at, IFNULL(account_pan, '')  
-	FROM bankdb.bank_account
-	WHERE account_id = ?`, bankAccountId)
+	rows := mysql.DB.QueryRow(util.GETQUERY+`WHERE account_id = ?`, bankAccountId)
 
 	scanError := rows.Scan(&bankAccountResponse.AccountId,
 		&bankAccountResponse.CustomerId,
@@ -127,6 +128,11 @@ func GetAccountById(ctx *gin.Context) {
 		&bankAccountResponse.CreatedAt,
 		&bankAccountResponse.UpdatedAt,
 		&bankAccountResponse.AccountPan,
+		&bankAccountResponse.IsActive,
+		&bankAccountResponse.IsLocked,
+		&bankAccountResponse.LockPeriodFd,
+		&bankAccountResponse.LockedUntil,
+		&bankAccountResponse.PenaltyFd,
 	)
 
 	bankAccountResponse.BalanceCheck()
@@ -187,7 +193,7 @@ func Withdraw(ctx *gin.Context) {
 	}
 
 	// Get a Tx for making transaction requests.
-	tx, err := util.DB.BeginTx(ctx, nil)
+	tx, err := mysql.DB.BeginTx(ctx, nil)
 	if err != nil {
 		fail(err)
 		return
@@ -199,10 +205,11 @@ func Withdraw(ctx *gin.Context) {
 	var enough bool
 	var openingBalance float64
 	var customerId int64
+
 	if err = tx.QueryRowContext(ctx, "SELECT (balance >= ?), balance, customer_id from bankdb.bank_account where account_id = ?",
 		withdrawAmount, accountId).Scan(&enough, &openingBalance, &customerId); err != nil {
 		if err == sql.ErrNoRows {
-			fail(fmt.Errorf("No account found"))
+			fail(errors.New("No account found"))
 			return
 		}
 		fail(err)
@@ -210,7 +217,7 @@ func Withdraw(ctx *gin.Context) {
 	}
 
 	if !enough {
-		fail(fmt.Errorf("Insufficient fund. Please enter again"))
+		fail(errors.New("Insufficient fund. Please enter again"))
 		return
 	}
 
@@ -282,11 +289,10 @@ func Deposit(ctx *gin.Context) {
 		fmt.Printf("Deposit error: %v", err)
 		errorResponse := constructErrorResponse(err.Error(), "1014", errorRespList)
 		constructResponse(http.StatusBadRequest, true, &errorResponse, ctx, nil)
-		return
 	}
 
 	// Get a Tx for making transaction requests.
-	tx, err := util.DB.BeginTx(ctx, nil)
+	tx, err := mysql.DB.BeginTx(ctx, nil)
 	if err != nil {
 		fail(err)
 		return
@@ -297,13 +303,24 @@ func Deposit(ctx *gin.Context) {
 	// Check if account exists
 	var openingBalance float64
 	var customerId int64
-	if err = tx.QueryRowContext(ctx, "SELECT balance, customer_id from bankdb.bank_account where account_id = ?",
-		accountId).Scan(&openingBalance, &customerId); err != nil {
+	var accountType string
+	var isLocked bool
+	if err = tx.QueryRowContext(ctx, "SELECT balance, customer_id, account_type, is_locked from bankdb.bank_account where account_id = ?",
+		accountId).Scan(&openingBalance, &customerId, &accountType, &isLocked); err != nil {
 		if err == sql.ErrNoRows {
-			fail(fmt.Errorf("No account found"))
+			fail(errors.New("No account found"))
 			return
 		}
 		fail(err)
+		return
+	}
+
+	if accountType == "FIXED" {
+		fail(errors.New("Deposit in fixed account is not allowed more than once."))
+		return
+	}
+	if isLocked {
+		fail(errors.New("Account is Locked. Transaction is not allowed."))
 		return
 	}
 
