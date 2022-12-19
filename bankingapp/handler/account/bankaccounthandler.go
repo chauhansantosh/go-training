@@ -199,8 +199,16 @@ func Withdraw(ctx *gin.Context) {
 	var enough bool
 	var openingBalance float64
 	var customerId int64
-	if err = tx.QueryRowContext(ctx, "SELECT (balance >= ?), balance, customer_id from bankdb.bank_account where account_id = ?",
-		withdrawAmount, accountId).Scan(&enough, &openingBalance, &customerId); err != nil {
+	//changes for fixed a/c withdrawl
+	var accType string
+	var isAccActive int
+	var lockPeriodFD string
+	var accOpendate time.Time
+	if err = tx.QueryRowContext(ctx, `SELECT (balance >= ?), balance, customer_id, account_type, is_active, 
+	IFNULL(lock_period_fd, ''), created_at
+	from bankdb.bank_account where account_id = ?`,
+		withdrawAmount, accountId).Scan(&enough, &openingBalance, &customerId,
+		&accType, &isAccActive, &lockPeriodFD, &accOpendate); err != nil {
 		if err == sql.ErrNoRows {
 			fail(fmt.Errorf("No account found"))
 			return
@@ -214,12 +222,37 @@ func Withdraw(ctx *gin.Context) {
 		return
 	}
 
-	// Update the account with new balance
-	_, err = tx.ExecContext(ctx, "UPDATE bankdb.bank_account SET balance = balance - ? WHERE account_id = ?",
-		withdrawAmount, accountId)
-	if err != nil {
-		fail(err)
-		return
+	if accType == "FIXED" {
+		//calculate FD maturity date
+		currentDate := time.Now()
+		diff := int64(currentDate.Sub(accOpendate).Hours() / 24)
+		fdLockPeriod, _ := strconv.ParseInt(lockPeriodFD, 10, 64)
+
+		if diff < (fdLockPeriod * 365) {
+			fail(fmt.Errorf("Locking period of your FD is still not complete."))
+			return
+		} else {
+			if withdrawAmount != openingBalance {
+				fail(fmt.Errorf("All amount has to be withdrawn from FD account. Your account balance is ", openingBalance))
+				return
+			} else {
+				// close the FD a/c by withdrawing entire amount
+				_, err = tx.ExecContext(ctx, "UPDATE bankdb.bank_account SET balance = 0, is_active = 0 WHERE account_id = ?",
+					accountId)
+				if err != nil {
+					fail(err)
+					return
+				}
+			}
+		}
+	} else {
+		// Update the account with new balance
+		_, err = tx.ExecContext(ctx, "UPDATE bankdb.bank_account SET balance = balance - ? WHERE account_id = ?",
+			withdrawAmount, accountId)
+		if err != nil {
+			fail(err)
+			return
+		}
 	}
 
 	newBalance := openingBalance - withdrawAmount

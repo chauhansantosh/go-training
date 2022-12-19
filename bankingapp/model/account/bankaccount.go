@@ -21,6 +21,7 @@ type BankAccount struct {
 	CreatedAt      *time.Time `json:"created_at,omitempty"`
 	UpdatedAt      *time.Time `json:"updated_at,omitempty"`
 	AccountPan     string     `json:"account_pan,omitempty"`
+	LockingPeriod  int64      `json:"lock_period_fd,omitempty"`
 }
 
 type ErrorResponse struct {
