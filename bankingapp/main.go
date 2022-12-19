@@ -4,29 +4,29 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/chauhansantosh/go-training/bankingapp/dbutil"
+	"github.com/chauhansantosh/go-training/bankingapp/util"
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/chauhansantosh/go-training/bankingapp/bankaccount"
-	bankaccounthandler "github.com/chauhansantosh/go-training/bankingapp/bankaccount/handler"
-	"github.com/chauhansantosh/go-training/bankingapp/customer"
-	customerhandler "github.com/chauhansantosh/go-training/bankingapp/customer/handler"
+	bankaccount "github.com/chauhansantosh/go-training/bankingapp/model/account"
+	accounthandler "github.com/chauhansantosh/go-training/bankingapp/handler/account"
+	customer "github.com/chauhansantosh/go-training/bankingapp/model/customer"
+	customerhandler "github.com/chauhansantosh/go-training/bankingapp/handler/customer"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 func main() {
 
-	db, err := dbutil.ConnectDb()
+	db, err := util.ConnectDb()
 	if err != nil {
 		log.Printf("Error %s when getting db connection", err)
 		return
 	}
-	dbutil.DB = db
+	util.DB = db
 	defer db.Close()
 	log.Printf("Successfully connected to database")
 
-	err = dbutil.CreateTables()
+	err = util.CreateTables()
 	if err != nil {
 		log.Printf("Create table failed with error %s", err)
 		return
@@ -92,11 +92,12 @@ func main() {
 	router.GET("/customers/:customerId", customerhandler.GetCustomerById)
 	router.PUT("/customer", customerhandler.CreateCustomer)
 
-	router.GET("/accounts", bankaccounthandler.GetAccounts)
-	router.GET("/accounts/:accountId", bankaccounthandler.GetAccountById)
-	router.PUT("/account", bankaccounthandler.CreateAccount)
-	router.PUT("/accounts/:accountId/withdraw", bankaccounthandler.Withdraw)
-	router.PUT("/accounts/:accountId/deposit", bankaccounthandler.Deposit)
+	router.GET("/accounts", accounthandler.GetAccounts)
+	router.GET("/accounts/:accountId", accounthandler.GetAccountById)
+	router.GET("/accounts/customer/:customerId/getallaccounts", accounthandler.GetAccountsByCustomerId)
+	router.PUT("/account", accounthandler.CreateAccount)
+	router.PUT("/accounts/:accountId/withdraw", accounthandler.Withdraw)
+	router.PUT("/accounts/:accountId/deposit", accounthandler.Deposit)
 
 	router.Run("localhost:8080")
 }

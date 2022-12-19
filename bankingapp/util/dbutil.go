@@ -1,4 +1,4 @@
-package dbutil
+package util
 
 import (
 	"context"
@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/chauhansantosh/go-training/bankingapp/bankaccount"
-	"github.com/chauhansantosh/go-training/bankingapp/customer"
+	bankaccount "github.com/chauhansantosh/go-training/bankingapp/model/account"
+	customer "github.com/chauhansantosh/go-training/bankingapp/model/customer"
 )
 
 const (

@@ -7,8 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/chauhansantosh/go-training/bankingapp/customer"
-	"github.com/chauhansantosh/go-training/bankingapp/dbutil"
+	customer "github.com/chauhansantosh/go-training/bankingapp/model/customer"
 	"github.com/chauhansantosh/go-training/bankingapp/util"
 	"github.com/gin-gonic/gin"
 )
@@ -34,7 +33,7 @@ func CreateCustomer(c *gin.Context) {
 		return
 	}
 
-	_, err := dbutil.InsertCustomer(customer)
+	_, err := util.InsertCustomer(customer)
 	switch err {
 	case nil:
 		constructResponse(http.StatusOK, false, nil, c, &customer)
@@ -57,7 +56,7 @@ func GetCustomers(ctx *gin.Context) {
 
 	var customerResponse customer.Customer
 
-	rows, err := dbutil.DB.Query(`SELECT customer_id, customer_name, customer_type, created_at, updated_at FROM bankdb.customer`)
+	rows, err := util.DB.Query(`SELECT customer_id, customer_name, customer_type, created_at, updated_at FROM bankdb.customer`)
 
 	if err != nil {
 		log.Println("Error while fetching customers", err)
@@ -102,7 +101,7 @@ func GetCustomerById(ctx *gin.Context) {
 	var customerResponse customer.Customer
 	customerId, _ := strconv.ParseInt(ctx.Param("customerId"), 10, 64)
 
-	rows := dbutil.DB.QueryRow(`SELECT 
+	rows := util.DB.QueryRow(`SELECT 
 	customer_id, customer_name, customer_type, created_at, updated_at 
 	FROM bankdb.customer
 	WHERE customer_id = ?`, customerId)
