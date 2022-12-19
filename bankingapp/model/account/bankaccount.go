@@ -1,4 +1,4 @@
-package bankaccount
+package account
 
 import (
 	"errors"

@@ -1,23 +1,19 @@
-package bankaccounthandler
+package accounthandler
 
 import (
 	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
-	"reflect"
 	"strconv"
 	"time"
 
-	"github.com/chauhansantosh/go-training/bankingapp/bankaccount"
-	"github.com/chauhansantosh/go-training/bankingapp/dbutil"
+	bankaccount "github.com/chauhansantosh/go-training/bankingapp/model/account"
+	"github.com/chauhansantosh/go-training/bankingapp/util"
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 )
 
 var start time.Time
-
-var timeType = reflect.TypeOf(time.Time{})
 
 func GetAccounts(ctx *gin.Context) {
 
@@ -26,8 +22,18 @@ func GetAccounts(ctx *gin.Context) {
 	bankaccountList := []bankaccount.BankAccount{}
 
 	var bankAccountResponse bankaccount.BankAccount
+	customerId, _ := strconv.ParseInt(ctx.Param("customerId"), 10, 64)
 
-	rows, err := dbutil.DB.Query(`SELECT account_id, customer_id, account_type, balance, created_at, updated_at, account_pan FROM bankdb.bank_account`)
+	query := `SELECT account_id, customer_id, account_type, balance, 
+	created_at, updated_at, IFNULL(account_pan, '')  
+	FROM bankdb.bank_account
+	WHERE (? > 0 AND customer_id = ?) OR (? = 0)`
+	fmt.Println("query ==>", query)
+
+	rows, err := util.DB.Query(query, customerId, customerId, customerId)
+	/*
+		rows, err := util.DB.Query(`SELECT account_id, customer_id, account_type, balance,
+		created_at, updated_at, IFNULL(account_pan, '')  FROM bankdb.bank_account`) */
 
 	if err != nil {
 		log.Println("Error while fetching bankaccounts", err)
@@ -77,19 +83,16 @@ func CreateAccount(c *gin.Context) {
 		constructResponse(http.StatusBadRequest, true, &errorResponse, c, nil)
 		return
 	}
-
-	v := validator.New()
-	err := v.Struct(bankaccount)
-
-	if err != nil {
-		for _, e := range err.(validator.ValidationErrors) {
-			errorRespList = constructErrorResponse(fmt.Sprint(e), "1005", errorRespList)
+	//Validate request payload
+	if errors, err := util.ValidateRequest(c, bankaccount); err != nil {
+		for _, e := range errors {
+			errorRespList = constructErrorResponse(e, "1005", errorRespList)
 		}
 		constructResponse(http.StatusBadRequest, true, &errorRespList, c, nil)
 		return
 	}
 
-	err = dbutil.InsertBankAccount(bankaccount)
+	err := util.InsertBankAccount(bankaccount)
 	switch err {
 	case nil:
 		constructResponse(http.StatusOK, false, nil, c, &bankaccount)
@@ -112,8 +115,8 @@ func GetAccountById(ctx *gin.Context) {
 	var bankAccountResponse bankaccount.BankAccount
 	bankAccountId, _ := strconv.ParseInt(ctx.Param("accountId"), 10, 64)
 
-	rows := dbutil.DB.QueryRow(`SELECT 
-	account_id, customer_id, account_type, balance, created_at, updated_at, account_pan 
+	rows := util.DB.QueryRow(`SELECT 
+	account_id, customer_id, account_type, balance, created_at, updated_at, IFNULL(account_pan, '')  
 	FROM bankdb.bank_account
 	WHERE account_id = ?`, bankAccountId)
 
@@ -147,6 +150,10 @@ func GetAccountById(ctx *gin.Context) {
 	}
 }
 
+func GetAccountsByCustomerId(ctx *gin.Context) {
+	GetAccounts(ctx)
+}
+
 // Withdraw money from bank account
 func Withdraw(ctx *gin.Context) {
 	errorRespList := []bankaccount.ErrorResponse{}
@@ -163,12 +170,10 @@ func Withdraw(ctx *gin.Context) {
 	}
 	withdrawAmount := req.Amount
 
-	v := validator.New()
-	err := v.Struct(req)
-
-	if err != nil {
-		for _, e := range err.(validator.ValidationErrors) {
-			errorRespList = constructErrorResponse(fmt.Sprint(e), "1010", errorRespList)
+	//Validate requst payload
+	if errors, err := util.ValidateRequest(ctx, req); err != nil {
+		for _, e := range errors {
+			errorRespList = constructErrorResponse(e, "1002", errorRespList)
 		}
 		constructResponse(http.StatusBadRequest, true, &errorRespList, ctx, nil)
 		return
@@ -179,11 +184,10 @@ func Withdraw(ctx *gin.Context) {
 		fmt.Printf("Deposit error: %v", err)
 		errorResponse := constructErrorResponse(err.Error(), "1011", errorRespList)
 		constructResponse(http.StatusBadRequest, true, &errorResponse, ctx, nil)
-		return
 	}
 
 	// Get a Tx for making transaction requests.
-	tx, err := dbutil.DB.BeginTx(ctx, nil)
+	tx, err := util.DB.BeginTx(ctx, nil)
 	if err != nil {
 		fail(err)
 		return
@@ -255,8 +259,6 @@ func Deposit(ctx *gin.Context) {
 	var req bankaccount.TransactionRequest
 	var accountRes bankaccount.BankAccount
 
-	//v, ok := binding.Validator.Engine().(*validator.Validate)
-
 	if err := ctx.BindJSON(&req); err != nil {
 		log.Printf("Error - Invalid Data in request.")
 		errorResponse := constructErrorResponse(err.Error(), "1012", errorRespList)
@@ -266,12 +268,10 @@ func Deposit(ctx *gin.Context) {
 	depositAmount := req.Amount
 	accountPan := req.AccountPan
 
-	v := validator.New()
-	err := v.Struct(req)
-
-	if err != nil {
-		for _, e := range err.(validator.ValidationErrors) {
-			errorRespList = constructErrorResponse(fmt.Sprint(e), "1013", errorRespList)
+	//Validate request payload
+	if errors, err := util.ValidateRequest(ctx, req); err != nil {
+		for _, e := range errors {
+			errorRespList = constructErrorResponse(e, "1002", errorRespList)
 		}
 		constructResponse(http.StatusBadRequest, true, &errorRespList, ctx, nil)
 		return
@@ -286,7 +286,7 @@ func Deposit(ctx *gin.Context) {
 	}
 
 	// Get a Tx for making transaction requests.
-	tx, err := dbutil.DB.BeginTx(ctx, nil)
+	tx, err := util.DB.BeginTx(ctx, nil)
 	if err != nil {
 		fail(err)
 		return

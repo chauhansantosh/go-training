@@ -26,9 +26,10 @@ CREATE TABLE `bank_account` (
   `penalty_fd` decimal(10,0) DEFAULT NULL,
   PRIMARY KEY (`account_id`),
   KEY `fk_customer` (`customer_id`),
-  CONSTRAINT `chk_account_type` CHECK ((`account_type` in ('SAVINGS','FIXED','CURRENT'))),
-  CONSTRAINT `chk_limit_sv` CHECK (((`balance` < 100000) and (`account_type` = 'SAVINGS')))
+  CONSTRAINT `chk_account_type` CHECK ((`account_type` in ('SAVINGS','FIXED','CURRENT')))
 );
+
+--------------------------------------------------- BEFORE INSERT --------------------------------------------------------
 
 DROP TRIGGER IF EXISTS `bankdb`.`bank_account_BEFORE_INSERT`;
 
@@ -41,6 +42,32 @@ CREATE DEFINER=`root`@`localhost` TRIGGER `bank_account_BEFORE_INSERT` BEFORE IN
 	END IF;
 END;$$
 DELIMITER ;
+
+DROP TRIGGER IF EXISTS `bankdb`.`account_limit_before_insert`;
+
+DELIMITER $$
+USE `bankdb`$$
+CREATE DEFINER=`root`@`localhost` TRIGGER `account_limit_before_insert` BEFORE INSERT ON `bank_account` FOR EACH ROW BEGIN
+	if NEW.account_type = 'SAVINGS' and NEW.balance > 10000000 then
+SELECT CONCAT('Balance limit reached. Can not have more than 10 millions in SAVINGS account.') INTO @error_text; 
+		SIGNAL SQLSTATE '48000' SET message_text = @error_text; 
+end if;
+END;$$
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS `bankdb`.`account_customer_must_exists`;
+
+DELIMITER $$
+USE `bankdb`$$
+CREATE DEFINER=`root`@`localhost` TRIGGER `account_customer_must_exists` BEFORE INSERT ON `bank_account` FOR EACH ROW BEGIN
+	IF NOT EXISTS (SELECT 1 FROM customer WHERE customer_id = NEW.customer_id) THEN 
+    SELECT CONCAT('Customer ', NEW.customer_id, ' does not exist. Create customer before creating account.') INTO @error_text; 
+		SIGNAL SQLSTATE '47000' SET message_text = @error_text; 
+	END IF;
+END;$$
+DELIMITER ;
+
+--------------------------------------------------------- BEFORE UPDATE--------------------------------------------------------
 
 DROP TRIGGER IF EXISTS `bankdb`.`bank_account_BEFORE_UPDATE`;
 
@@ -56,6 +83,21 @@ elseif (NEW.balance - OLD.balance > 250000 AND OLD.account_type='CURRENT' AND (N
 END IF;
 END$$
 DELIMITER ;
+
+
+DROP TRIGGER IF EXISTS `bankdb`.`account_limit_before_update`;
+
+DELIMITER $$
+USE `bankdb`$$
+CREATE DEFINER=`root`@`localhost` TRIGGER `account_limit_before_update` BEFORE UPDATE ON `bank_account` FOR EACH ROW BEGIN
+if OLD.account_type = 'SAVINGS' and NEW.balance > 10000000 then
+SELECT CONCAT('Balance limit reached. Can not have more than 10 millions in SAVINGS account.') INTO @error_text; 
+		SIGNAL SQLSTATE '48000' SET message_text = @error_text; 
+end if;
+END;$$
+DELIMITER ;
+
+-------------------------------------------------------------------------------
 
 
 CREATE TABLE `transaction` (
