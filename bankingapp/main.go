@@ -4,25 +4,28 @@ import (
 	"fmt"
 	"log"
 
+	mysql "github.com/chauhansantosh/go-training/bankingapp/mysqldb"
 	"github.com/chauhansantosh/go-training/bankingapp/util"
 
 	"github.com/gin-gonic/gin"
 
-	bankaccount "github.com/chauhansantosh/go-training/bankingapp/model/account"
 	accounthandler "github.com/chauhansantosh/go-training/bankingapp/handler/account"
-	customer "github.com/chauhansantosh/go-training/bankingapp/model/customer"
 	customerhandler "github.com/chauhansantosh/go-training/bankingapp/handler/customer"
+	bankaccount "github.com/chauhansantosh/go-training/bankingapp/model/account"
+	customer "github.com/chauhansantosh/go-training/bankingapp/model/customer"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 func main() {
 
-	db, err := util.ConnectDb()
+	db, err := mysql.ConnectDb()
 	if err != nil {
 		log.Printf("Error %s when getting db connection", err)
 		return
 	}
-	util.DB = db
+	mysql.DB = db
+
+	util.CreateDb("bankdb")
 	defer db.Close()
 	log.Printf("Successfully connected to database")
 
