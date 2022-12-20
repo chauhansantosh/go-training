@@ -3,11 +3,10 @@ package main
 import (
 	"fmt"
 
-	"example.com/fifthassessment"
-	"example.com/firstassessment"
-	"example.com/fourthassessment"
-	"example.com/secondassessment"
-	"example.com/thirdassessment"
+	"github.com/chauhansantosh/go-training/firstassessment"
+	"github.com/chauhansantosh/go-training/fourthassessment"
+	"github.com/chauhansantosh/go-training/secondassessment"
+	"github.com/chauhansantosh/go-training/thirdassessment"
 )
 
 func main() {
