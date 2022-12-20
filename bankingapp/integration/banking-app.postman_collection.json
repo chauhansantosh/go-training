@@ -1,14 +1,91 @@
 {
 	"info": {
-		"_postman_id": "47866296-e686-46b0-b866-0c7fbf581be8",
+		"_postman_id": "782083fe-557a-42e0-b604-fdb00e5ef419",
 		"name": "banking-app",
+		"description": "Golang API for a banking application. It describes create/view a customer, open a bank account for a customer, withdraw money from bank account, deposit money to bank account, view balance for any account, view all the fixed accounts for a customer etc.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "24956210"
+		"_exporter_id": "24207127"
 	},
 	"item": [
 		{
 			"name": "Customer",
 			"item": [
+				{
+					"name": "Create customer success",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"customer_id\": 123,\r\n    \"customer_name\": \"Santosh\",\r\n    \"customer_type\": \"INDIVIDUAL\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/customer",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"customer"
+							]
+						},
+						"description": "Create cutomer successfully for the given paylod."
+					},
+					"response": [
+						{
+							"name": "Create customer success",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"customer_id\": 123,\r\n    \"customer_name\": \"Santosh\",\r\n    \"customer_type\": \"INDIVIDUAL\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/customer",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"customer"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 20 Dec 2022 15:13:27 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "157"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"timeElapsed\": 9223372036854,\n    \"hasErrorResponse\": false,\n    \"customer\": {\n        \"customer_id\": 123,\n        \"customer_name\": \"Santosh\",\n        \"customer_type\": \"INDIVIDUAL\"\n    }\n}"
+						}
+					]
+				},
 				{
 					"name": "Create customer error - validation",
 					"request": {
@@ -33,71 +110,60 @@
 							"path": [
 								"customer"
 							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create customer success",
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"customer_id\": 789,\r\n    \"customer_name\": \"Jharana\",\r\n    \"customer_type\": \"INDIVIDUAL\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
 						},
-						"url": {
-							"raw": "http://localhost:8080/customer",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"customer"
-							]
-						}
+						"description": "Throw error if required fields are missing from the payload."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Create customer error - validation",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"customer_id\": 0,\r\n    \"customer_name\": \"\",\r\n    \"customer_type\": \"\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/customer",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"customer"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 20 Dec 2022 15:13:46 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "302"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 400,\n    \"timeElapsed\": 9223372036854,\n    \"hasErrorResponse\": true,\n    \"errorResponse\": [\n        {\n            \"errorMessage\": \"customer_id is a required field\",\n            \"errorCode\": \"1002\"\n        },\n        {\n            \"errorMessage\": \"customer_name is a required field\",\n            \"errorCode\": \"1002\"\n        },\n        {\n            \"errorMessage\": \"customer_type is a required field\",\n            \"errorCode\": \"1002\"\n        }\n    ]\n}"
+						}
+					]
 				},
 				{
 					"name": "Get customers success",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"customer_id\": 1,\r\n    \"customer_name\": \"\",\r\n    \"customer_type\": \"\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8080/customers",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"customers"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get customer by customer_id",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -123,26 +189,411 @@
 							"path": [
 								"customers"
 							]
-						}
+						},
+						"description": "Get all the customers created in database."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Get customers success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/customers",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"customers"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 20 Dec 2022 15:25:38 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "491"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"hasErrorResponse\": false,\n    \"customers\": [\n        {\n            \"customer_id\": 123,\n            \"customer_name\": \"Santosh\",\n            \"customer_type\": \"INDIVIDUAL\",\n            \"created_at\": \"2022-12-20T10:13:27Z\",\n            \"updated_at\": \"2022-12-20T10:13:27Z\"\n        },\n        {\n            \"customer_id\": 234,\n            \"customer_name\": \"Deepika\",\n            \"customer_type\": \"INDIVIDUAL\",\n            \"created_at\": \"2022-12-20T10:24:09Z\",\n            \"updated_at\": \"2022-12-20T10:24:09Z\"\n        },\n        {\n            \"customer_id\": 345,\n            \"customer_name\": \"HCL\",\n            \"customer_type\": \"COMPANY\",\n            \"created_at\": \"2022-12-20T10:24:47Z\",\n            \"updated_at\": \"2022-12-20T10:24:47Z\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Get customer by customer_id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/customers/123",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"customers",
+								"123"
+							]
+						},
+						"description": "Get customer by customer_id passed in path variable."
+					},
+					"response": [
+						{
+							"name": "Get customer by customer_id",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/customers/123",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"customers",
+										"123"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 20 Dec 2022 15:15:05 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "220"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"timeElapsed\": 1,\n    \"hasErrorResponse\": false,\n    \"customers\": [\n        {\n            \"customer_id\": 123,\n            \"customer_name\": \"Santosh\",\n            \"customer_type\": \"INDIVIDUAL\",\n            \"created_at\": \"2022-12-20T10:13:27Z\",\n            \"updated_at\": \"2022-12-20T10:13:27Z\"\n        }\n    ]\n}"
+						}
+					]
 				}
-			]
+			],
+			"description": "APIs for managing customer."
 		},
 		{
-			"name": "Accounts",
+			"name": "Accounts - Common",
 			"item": [
 				{
-					"name": "Common",
-					"item": [
+					"name": "Create account success",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"customer_id\": 123,\r\n    \"account_id\": 51691852,\r\n    \"account_type\": \"SAVINGS\",\r\n    \"balance\": 10000.5\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/account",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"account"
+							]
+						},
+						"description": "Create an account successfully for the given payload."
+					},
+					"response": [
 						{
-							"name": "Deposit into account",
-							"request": {
+							"name": "Create account success",
+							"originalRequest": {
 								"method": "PUT",
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n   \"amount\": 10\r\n}",
+									"raw": "{\r\n    \"customer_id\": 123,\r\n    \"account_id\": 51691852,\r\n    \"account_type\": \"SAVINGS\",\r\n    \"balance\": 10000.5\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/account",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"account"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 20 Dec 2022 15:17:31 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "171"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"timeElapsed\": 9223372036854,\n    \"hasErrorResponse\": false,\n    \"bank_account\": {\n        \"customer_id\": 123,\n        \"account_id\": 51691852,\n        \"account_type\": \"SAVINGS\",\n        \"balance\": 10000.5\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Create account error - customer does not exist",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"customer_id\": 234,\r\n    \"account_id\": 51691853,\r\n    \"account_type\": \"SAVINGS\",\r\n    \"balance\": 20000\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/account",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"account"
+							]
+						},
+						"description": "Throw an error if customer does not exist in database while creating bank account for the customer."
+					},
+					"response": [
+						{
+							"name": "Create account error - customer does not exist",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"customer_id\": 234,\r\n    \"account_id\": 51691853,\r\n    \"account_type\": \"SAVINGS\",\r\n    \"balance\": 20000\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/account",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"account"
+									]
+								}
+							},
+							"status": "Internal Server Error",
+							"code": 500,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 20 Dec 2022 15:20:33 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "208"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 500,\n    \"timeElapsed\": 51989,\n    \"hasErrorResponse\": true,\n    \"errorResponse\": [\n        {\n            \"errorMessage\": \"Error 1644 (47000): Customer 234 does not exist. Create customer before creating account.\",\n            \"errorCode\": \"1006\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Create account error - missing required fields",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"customer_id\": 34567,\r\n    \"account_id\": 0,\r\n    \"account_type\": \"\",\r\n    \"balance\": 0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/account",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"account"
+							]
+						},
+						"description": "Throw an error if missing required fields while creating bank account."
+					},
+					"response": [
+						{
+							"name": "Create account error - missing required fields",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"customer_id\": 34567,\r\n    \"account_id\": 0,\r\n    \"account_type\": \"\",\r\n    \"balance\": 0\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/account",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"account"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 20 Dec 2022 15:50:20 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "287"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 400,\n    \"timeElapsed\": 908374,\n    \"hasErrorResponse\": true,\n    \"errorResponse\": [\n        {\n            \"errorMessage\": \"account_id is a required field\",\n            \"errorCode\": \"1005\"\n        },\n        {\n            \"errorMessage\": \"account_type is a required field\",\n            \"errorCode\": \"1005\"\n        },\n        {\n            \"errorMessage\": \"balance is a required field\",\n            \"errorCode\": \"1005\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Deposit into account",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"amount\": 100\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/accounts/51691852/deposit",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"accounts",
+								"51691852",
+								"deposit"
+							]
+						},
+						"description": "Deposit money into the account passed in path variable and display the balance in response along with customer id and account id."
+					},
+					"response": [
+						{
+							"name": "Deposit into account",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n   \"amount\": 100\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -163,14 +614,142 @@
 									]
 								}
 							},
-							"response": []
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 20 Dec 2022 15:18:56 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "146"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"timeElapsed\": 9223372036854,\n    \"hasErrorResponse\": false,\n    \"bank_account\": {\n        \"customer_id\": 123,\n        \"account_id\": 51691852,\n        \"balance\": 10100.5\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Withdraw from account",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"amount\": 100\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
+						"url": {
+							"raw": "http://localhost:8080/accounts/51691852/withdraw",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"accounts",
+								"51691852",
+								"withdraw"
+							]
+						},
+						"description": "Withdraw from the account passed in path variable and display the balance in response."
+					},
+					"response": [
+						{
+							"name": "Withdraw from account",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n   \"amount\": 100\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/accounts/51691852/withdraw",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"accounts",
+										"51691852",
+										"withdraw"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 20 Dec 2022 15:19:22 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "146"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"timeElapsed\": 9223372036854,\n    \"hasErrorResponse\": false,\n    \"bank_account\": {\n        \"customer_id\": 123,\n        \"account_id\": 51691852,\n        \"balance\": 10000.5\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get all accounts",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/accounts",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"accounts"
+							]
+						},
+						"description": "Get all the accounts in the database."
+					},
+					"response": [
 						{
 							"name": "Get all accounts",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
+							"originalRequest": {
 								"method": "GET",
 								"header": [],
 								"body": {
@@ -194,14 +773,63 @@
 									]
 								}
 							},
-							"response": []
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 20 Dec 2022 15:27:47 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "595"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"timeElapsed\": 3,\n    \"hasErrorResponse\": false,\n    \"bank_accounts\": [\n        {\n            \"customer_id\": 123,\n            \"account_id\": 51691852,\n            \"account_type\": \"SAVINGS\",\n            \"balance\": 10000.5,\n            \"created_at\": \"2022-12-20T10:17:31Z\",\n            \"updated_at\": \"2022-12-20T10:17:31Z\",\n            \"is_active\": true\n        },\n        {\n            \"customer_id\": 234,\n            \"account_id\": 51691853,\n            \"account_type\": \"SAVINGS\",\n            \"balance\": 20000,\n            \"created_at\": \"2022-12-20T10:26:59Z\",\n            \"updated_at\": \"2022-12-20T10:26:59Z\",\n            \"is_active\": true\n        },\n        {\n            \"customer_id\": 345,\n            \"account_id\": 51691854,\n            \"account_type\": \"CURRENT\",\n            \"balance\": 20000,\n            \"created_at\": \"2022-12-20T10:27:34Z\",\n            \"updated_at\": \"2022-12-20T10:27:34Z\",\n            \"is_active\": true\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Get account by account_id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
+						"url": {
+							"raw": "http://localhost:8080/accounts/51691852",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"accounts",
+								"51691852"
+							]
+						},
+						"description": "Get account details for the account id passed in path variable."
+					},
+					"response": [
 						{
 							"name": "Get account by account_id",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
+							"originalRequest": {
 								"method": "GET",
 								"header": [],
 								"body": {
@@ -226,231 +854,67 @@
 									]
 								}
 							},
-							"response": []
-						},
-						{
-							"name": "Create account success",
-							"request": {
-								"method": "PUT",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"customer_id\": 34567,\r\n    \"account_id\": 51691858,\r\n    \"account_type\": \"FIXED\",\r\n    \"balance\": 10000.5\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
 								},
-								"url": {
-									"raw": "http://localhost:8080/account",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"account"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Create account error",
-							"request": {
-								"method": "PUT",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"customer_id\": 34567,\r\n    \"account_id\": 51691857,\r\n    \"account_type\": \"FIXED\",\r\n    \"balance\": 10000.5\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
+								{
+									"key": "Date",
+									"value": "Tue, 20 Dec 2022 15:28:29 GMT"
 								},
-								"url": {
-									"raw": "http://localhost:8080/account",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"account"
-									]
+								{
+									"key": "Content-Length",
+									"value": "235"
 								}
-							},
-							"response": []
-						},
-						{
-							"name": "Withdraw from account",
-							"request": {
-								"method": "PUT",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n   \"amount\": 10\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:8080/accounts/51691852/withdraw",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"accounts",
-										"51691852",
-										"withdraw"
-									]
-								}
-							},
-							"response": []
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"hasErrorResponse\": false,\n    \"bank_accounts\": [\n        {\n            \"customer_id\": 123,\n            \"account_id\": 51691852,\n            \"account_type\": \"SAVINGS\",\n            \"balance\": 10000.5,\n            \"created_at\": \"2022-12-20T10:17:31Z\",\n            \"updated_at\": \"2022-12-20T10:17:31Z\",\n            \"is_active\": true\n        }\n    ]\n}"
 						}
 					]
-				},
+				}
+			],
+			"description": "APIs for managing bank accounts for different customers."
+		},
+		{
+			"name": "Accounts - Savings",
+			"item": [
 				{
-					"name": "Fixed",
-					"item": [
-						{
-							"name": "Create FIXED account error",
-							"request": {
-								"method": "PUT",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"customer_id\": 345,\r\n    \"account_id\": 51691857,\r\n    \"account_type\": \"FIXED\",\r\n    \"balance\": 100000\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:8080/account",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"account"
-									]
+					"name": "Deposit into savings account more than 50K",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"amount\": 500001\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
 								}
-							},
-							"response": []
+							}
 						},
-						{
-							"name": "Create FIXED account  success",
-							"request": {
-								"method": "PUT",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"customer_id\": 345,\r\n    \"account_id\": 51691857,\r\n    \"account_type\": \"FIXED\",\r\n    \"balance\": 100000\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:8080/account",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"account"
-									]
-								}
-							},
-							"response": []
+						"url": {
+							"raw": "http://localhost:8080/accounts/51691852/deposit",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"accounts",
+								"51691852",
+								"deposit"
+							]
 						},
-						{
-							"name": "Deposit into fixed account",
-							"request": {
-								"method": "PUT",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n   \"amount\": 10\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:8080/accounts/51691854/deposit",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"accounts",
-										"51691854",
-										"deposit"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get all accounts for customer",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:8080/accounts/customer/345/getallaccounts",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"accounts",
-										"customer",
-										"345",
-										"getallaccounts"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "Current",
-					"item": []
-				},
-				{
-					"name": "Savings",
-					"item": [
+						"description": "Throw error if pan number not provided while depositing more than 50K in savings account."
+					},
+					"response": [
 						{
 							"name": "Deposit into savings account more than 50K",
-							"request": {
+							"originalRequest": {
 								"method": "PUT",
 								"header": [],
 								"body": {
@@ -476,11 +940,353 @@
 									]
 								}
 							},
-							"response": []
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 20 Dec 2022 15:29:12 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "194"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 400,\n    \"timeElapsed\": 43243,\n    \"hasErrorResponse\": true,\n    \"errorResponse\": [\n        {\n            \"errorMessage\": \"Error 1644 (46000): Pan number is mandatory for depositing more than 50000.\",\n            \"errorCode\": \"1014\"\n        }\n    ]\n}"
 						}
 					]
 				}
-			]
+			],
+			"description": "APIs for scenarios specific to saving accounts."
+		},
+		{
+			"name": "Accounts - Fixed",
+			"item": [
+				{
+					"name": "Create FIXED account error",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"customer_id\": 345,\r\n    \"account_id\": 51691857,\r\n    \"account_type\": \"FIXED\",\r\n    \"balance\": 100000\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/account",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"account"
+							]
+						},
+						"description": "Throw error if locking period was not provided while creating a fixed account."
+					},
+					"response": [
+						{
+							"name": "Create FIXED account error",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"customer_id\": 345,\r\n    \"account_id\": 51691857,\r\n    \"account_type\": \"FIXED\",\r\n    \"balance\": 100000\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/account",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"account"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 20 Dec 2022 15:30:02 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "167"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 400,\n    \"timeElapsed\": 93389,\n    \"hasErrorResponse\": true,\n    \"errorResponse\": [\n        {\n            \"errorMessage\": \"lock_period_fd is required for AccountType FIXED\",\n            \"errorCode\": \"1005\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Create FIXED account  success",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"customer_id\": 234,\r\n    \"account_id\": 51691857,\r\n    \"account_type\": \"FIXED\",\r\n    \"balance\": 100000,\r\n    \"lock_period_fd\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/account",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"account"
+							]
+						},
+						"description": "Create a fixed account successfully for the given valid payload."
+					},
+					"response": [
+						{
+							"name": "Create FIXED account  success",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"customer_id\": 234,\r\n    \"account_id\": 51691857,\r\n    \"account_type\": \"FIXED\",\r\n    \"balance\": 100000,\r\n    \"lock_period_fd\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/account",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"account"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 20 Dec 2022 15:32:23 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "180"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"timeElapsed\": 233802,\n    \"hasErrorResponse\": false,\n    \"bank_account\": {\n        \"customer_id\": 234,\n        \"account_id\": 51691857,\n        \"account_type\": \"FIXED\",\n        \"balance\": 100000,\n        \"lock_period_fd\": 1\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Deposit into fixed account",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"amount\": 100\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/accounts/51691857/deposit",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"accounts",
+								"51691857",
+								"deposit"
+							]
+						},
+						"description": "Throw error if deposing into fixed account after account was created. Deposit in FD can be done only once while creating the account."
+					},
+					"response": [
+						{
+							"name": "Deposit into fixed account",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n   \"amount\": 100\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/accounts/51691857/deposit",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"accounts",
+										"51691857",
+										"deposit"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 20 Dec 2022 15:33:38 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "175"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 400,\n    \"timeElapsed\": 308928,\n    \"hasErrorResponse\": true,\n    \"errorResponse\": [\n        {\n            \"errorMessage\": \"Deposit in fixed account is not allowed more than once.\",\n            \"errorCode\": \"1014\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Get all accounts for customer",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/accounts/customer/234/getallaccounts",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"accounts",
+								"customer",
+								"234",
+								"getallaccounts"
+							]
+						},
+						"description": "Get all accounts for a customer. A customer can have more than one FD account."
+					},
+					"response": [
+						{
+							"name": "Get all accounts for customer",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/accounts/customer/234/getallaccounts",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"accounts",
+										"customer",
+										"234",
+										"getallaccounts"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 20 Dec 2022 15:35:12 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "773"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"timeElapsed\": 16,\n    \"hasErrorResponse\": false,\n    \"bank_accounts\": [\n        {\n            \"customer_id\": 234,\n            \"account_id\": 51691853,\n            \"account_type\": \"SAVINGS\",\n            \"balance\": 20000,\n            \"created_at\": \"2022-12-20T10:26:59Z\",\n            \"updated_at\": \"2022-12-20T10:26:59Z\",\n            \"is_active\": true\n        },\n        {\n            \"customer_id\": 234,\n            \"account_id\": 51691856,\n            \"account_type\": \"FIXED\",\n            \"balance\": 20000,\n            \"created_at\": \"2022-12-20T10:34:35Z\",\n            \"updated_at\": \"2022-12-20T10:34:35Z\",\n            \"lock_period_fd\": 2,\n            \"is_locked\": true,\n            \"is_active\": true,\n            \"penalty_fd\": 0.1,\n            \"locked_until\": \"2024-12-20T15:34:36Z\"\n        },\n        {\n            \"customer_id\": 234,\n            \"account_id\": 51691857,\n            \"account_type\": \"FIXED\",\n            \"balance\": 100000,\n            \"created_at\": \"2022-12-20T10:32:23Z\",\n            \"updated_at\": \"2022-12-20T10:32:23Z\",\n            \"lock_period_fd\": 1,\n            \"is_locked\": true,\n            \"is_active\": true,\n            \"penalty_fd\": 0.1,\n            \"locked_until\": \"2023-12-20T15:32:23Z\"\n        }\n    ]\n}"
+						}
+					]
+				}
+			],
+			"description": "APIs specific to fixed accounts."
 		}
 	]
 }
