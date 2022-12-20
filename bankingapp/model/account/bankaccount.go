@@ -21,7 +21,11 @@ type BankAccount struct {
 	CreatedAt      *time.Time `json:"created_at,omitempty"`
 	UpdatedAt      *time.Time `json:"updated_at,omitempty"`
 	AccountPan     string     `json:"account_pan,omitempty"`
-	LockingPeriod  int64      `json:"lock_period_fd,omitempty"`
+	LockPeriodFd   int        `json:"lock_period_fd,omitempty" validate:"required_if=AccountType FIXED"`
+	IsLocked       bool       `json:"is_locked,omitempty"`
+	IsActive       bool       `json:"is_active,omitempty"`
+	PenaltyFd      float32    `json:"penalty_fd,omitempty"`
+	LockedUntil    *time.Time `json:"locked_until,omitempty"`
 }
 
 type ErrorResponse struct {

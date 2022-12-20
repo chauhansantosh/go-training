@@ -8,6 +8,7 @@ import (
 	"time"
 
 	customer "github.com/chauhansantosh/go-training/bankingapp/model/customer"
+	mysql "github.com/chauhansantosh/go-training/bankingapp/mysqldb"
 	"github.com/chauhansantosh/go-training/bankingapp/util"
 	"github.com/gin-gonic/gin"
 )
@@ -56,7 +57,7 @@ func GetCustomers(ctx *gin.Context) {
 
 	var customerResponse customer.Customer
 
-	rows, err := util.DB.Query(`SELECT customer_id, customer_name, customer_type, created_at, updated_at FROM bankdb.customer`)
+	rows, err := mysql.DB.Query(`SELECT customer_id, customer_name, customer_type, created_at, updated_at FROM bankdb.customer`)
 
 	if err != nil {
 		log.Println("Error while fetching customers", err)
@@ -101,7 +102,7 @@ func GetCustomerById(ctx *gin.Context) {
 	var customerResponse customer.Customer
 	customerId, _ := strconv.ParseInt(ctx.Param("customerId"), 10, 64)
 
-	rows := util.DB.QueryRow(`SELECT 
+	rows := mysql.DB.QueryRow(`SELECT 
 	customer_id, customer_name, customer_type, created_at, updated_at 
 	FROM bankdb.customer
 	WHERE customer_id = ?`, customerId)

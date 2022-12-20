@@ -13,7 +13,7 @@ CREATE TABLE `customer` (
 );
 
 CREATE TABLE `bank_account` (
-  `account_id` int unsigned NOT NULL,
+ `account_id` int unsigned NOT NULL,
   `customer_id` int unsigned NOT NULL,
   `balance` float unsigned NOT NULL,
   `account_type` text NOT NULL,
@@ -23,7 +23,8 @@ CREATE TABLE `bank_account` (
   `is_active` tinyint(1) DEFAULT '1',
   `is_locked` tinyint(1) DEFAULT '0',
   `lock_period_fd` int unsigned DEFAULT NULL,
-  `penalty_fd` decimal(10,0) DEFAULT NULL,
+  `penalty_fd` decimal(10,3) DEFAULT NULL,
+  `locked_until` datetime DEFAULT NULL,
   PRIMARY KEY (`account_id`),
   KEY `fk_customer` (`customer_id`),
   CONSTRAINT `chk_account_type` CHECK ((`account_type` in ('SAVINGS','FIXED','CURRENT')))
