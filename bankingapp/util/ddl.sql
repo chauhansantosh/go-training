@@ -1,6 +1,8 @@
 CREATE DATABASE IF NOT EXISTS bankdb;
 
-CREATE TABLE `customer` (
+use bankdb;
+
+CREATE TABLE IF NOT EXISTS `customer` (
   `customer_id` int unsigned NOT NULL,
   `customer_name` text NOT NULL,
   `customer_type` text NOT NULL,
@@ -12,7 +14,7 @@ CREATE TABLE `customer` (
   CONSTRAINT `chk_acc_type` CHECK ((`customer_type` in ('INDIVIDUAL','COMPANY')))
 );
 
-CREATE TABLE `bank_account` (
+CREATE TABLE IF NOT EXISTS `bank_account` (
  `account_id` int unsigned NOT NULL,
   `customer_id` int unsigned NOT NULL,
   `balance` float unsigned NOT NULL,
@@ -30,7 +32,7 @@ CREATE TABLE `bank_account` (
   CONSTRAINT `chk_account_type` CHECK ((`account_type` in ('SAVINGS','FIXED','CURRENT')))
 );
 
---------------------------------------------------- BEFORE INSERT --------------------------------------------------------
+#--------------------------------------------------- BEFORE INSERT --------------------------------------------------------
 
 DROP TRIGGER IF EXISTS `bankdb`.`bank_account_BEFORE_INSERT`;
 
@@ -68,7 +70,7 @@ CREATE DEFINER=`root`@`localhost` TRIGGER `account_customer_must_exists` BEFORE 
 END;$$
 DELIMITER ;
 
---------------------------------------------------------- BEFORE UPDATE--------------------------------------------------------
+#--------------------------------------------------------- BEFORE UPDATE--------------------------------------------------------
 
 DROP TRIGGER IF EXISTS `bankdb`.`bank_account_BEFORE_UPDATE`;
 
@@ -98,10 +100,10 @@ end if;
 END;$$
 DELIMITER ;
 
--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
 
-CREATE TABLE `transaction` (
+CREATE TABLE IF NOT EXISTS `transaction` (
   `transaction_id` int unsigned NOT NULL AUTO_INCREMENT,
   `account_id` int unsigned DEFAULT NULL,
   `customer_id` int unsigned DEFAULT NULL,
@@ -116,5 +118,3 @@ CREATE TABLE `transaction` (
   CONSTRAINT `fk_account` FOREIGN KEY (`account_id`) REFERENCES `bank_account` (`account_id`),
   CONSTRAINT `fk_customer` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`)
 );
-
-
