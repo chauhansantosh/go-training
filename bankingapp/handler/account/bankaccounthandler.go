@@ -358,6 +358,11 @@ func Deposit(ctx *gin.Context) {
 		return
 	}
 
+	if accountType == "SAVINGS" && depositAmount > 50000 && accountPan == "" {
+		fail(errors.New("PAN is mandatory to deposit the amount more than 50000"))
+		return
+	}
+
 	if accountType == "FIXED" {
 		fail(errors.New("Deposit in fixed account is not allowed more than once."))
 		return
