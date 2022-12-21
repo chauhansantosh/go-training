@@ -50,8 +50,9 @@ type AccountResponse struct {
 }
 
 type TransactionRequest struct {
-	Amount     float64 `json:"amount" validate:"required,min=1"`
-	AccountPan string  `json:"account_pan,omitempty"`
+	Amount              float64 `json:"amount" validate:"required,min=1"`
+	AccountPan          string  `json:"account_pan,omitempty"`
+	PreMatureWithdrawal bool    `json:preMatureWithdrawal`
 }
 
 func (account *BankAccount) Init(customerId int64, accountId int64, accountType string, openingBalance float64) {

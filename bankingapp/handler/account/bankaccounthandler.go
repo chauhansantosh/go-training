@@ -175,6 +175,7 @@ func Withdraw(ctx *gin.Context) {
 		return
 	}
 	withdrawAmount := req.Amount
+	preMatureWithdrawal := req.PreMatureWithdrawal
 
 	//Validate requst payload
 	if errors, err := util.ValidateRequest(ctx, req); err != nil {
@@ -209,12 +210,13 @@ func Withdraw(ctx *gin.Context) {
 	var accType string
 	var isAccActive int
 	var lockPeriodFD string
-	var accOpendate time.Time
+	var fdPenalty float32
+	var lockedUntil string
 	if err = tx.QueryRowContext(ctx, `SELECT (balance >= ?), balance, customer_id, account_type, is_active, 
-	IFNULL(lock_period_fd, ''), created_at
+	IFNULL(lock_period_fd, ''), penalty_fd, IFNULL(locked_until, '')
 	from bankdb.bank_account where account_id = ?`,
 		withdrawAmount, accountId).Scan(&enough, &openingBalance, &customerId,
-		&accType, &isAccActive, &lockPeriodFD, &accOpendate); err != nil {
+		&accType, &isAccActive, &lockPeriodFD, &fdPenalty, &lockedUntil); err != nil {
 
 		if err == sql.ErrNoRows {
 			fail(errors.New("No account found"))
@@ -229,27 +231,37 @@ func Withdraw(ctx *gin.Context) {
 		return
 	}
 
+	newBalance := openingBalance - withdrawAmount
+
 	if accType == "FIXED" {
 		//calculate FD maturity date
 		currentDate := time.Now()
-		diff := int64(currentDate.Sub(accOpendate).Hours() / 24)
-		fdLockPeriod, _ := strconv.ParseInt(lockPeriodFD, 10, 64)
+		layout := "2006-01-02 15:04:05"
+		t, err := time.Parse(layout, lockedUntil)
+		if err != nil {
+			fail(errors.New("Error in converting FD Maturity date"))
+			return
+		}
+		//fdMaturityDate := t.Format(layout)
 
-		if diff < (fdLockPeriod * 365) {
+		if currentDate.Before(t) && !preMatureWithdrawal {
 			fail(fmt.Errorf("Locking period of your FD is still not complete."))
 			return
 		} else {
-			if withdrawAmount != openingBalance {
+			if preMatureWithdrawal && withdrawAmount == openingBalance {
+				penalty := openingBalance * 0.1
+				withdrawAmount = openingBalance - penalty
+				newBalance = 0
+			} else if withdrawAmount != openingBalance {
 				fail(fmt.Errorf("All amount has to be withdrawn from FD account. Your account balance is ", openingBalance))
 				return
-			} else {
-				// close the FD a/c by withdrawing entire amount
-				_, err = tx.ExecContext(ctx, "UPDATE bankdb.bank_account SET balance = 0, is_active = 0 WHERE account_id = ?",
-					accountId)
-				if err != nil {
-					fail(err)
-					return
-				}
+			}
+			// close the FD a/c by withdrawing entire amount
+			_, err = tx.ExecContext(ctx, "UPDATE bankdb.bank_account SET balance = 0, is_active = 0 WHERE account_id = ?",
+				accountId)
+			if err != nil {
+				fail(err)
+				return
 			}
 		}
 	} else {
@@ -261,8 +273,6 @@ func Withdraw(ctx *gin.Context) {
 			return
 		}
 	}
-
-	newBalance := openingBalance - withdrawAmount
 
 	// Create a new row in the transaction table.
 	result, err := tx.ExecContext(ctx, `INSERT INTO 
