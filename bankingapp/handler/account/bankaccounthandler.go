@@ -274,6 +274,9 @@ func Withdraw(ctx *gin.Context) {
 			return
 		}
 		newBalance = openingBalance - withdrawAmount
+		if overdraftallowed {
+			newOdAmount = overdraftamount
+		}
 	} else if !enough && overdraftallowed && (overdraftamount+openingBalance) >= withdrawAmount {
 		// Update the account with new balance
 		newOdAmount = overdraftamount - (withdrawAmount - openingBalance)

@@ -1,10 +1,9 @@
 {
 	"info": {
-		"_postman_id": "782083fe-557a-42e0-b604-fdb00e5ef419",
+		"_postman_id": "3c3d96e4-e171-4cdc-b9f5-889a99f30647",
 		"name": "banking-app",
 		"description": "Golang API for a banking application. It describes create/view a customer, open a bank account for a customer, withdraw money from bank account, deposit money to bank account, view balance for any account, view all the fixed accounts for a customer etc.",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "24207127"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
@@ -17,7 +16,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"customer_id\": 123,\r\n    \"customer_name\": \"Santosh\",\r\n    \"customer_type\": \"INDIVIDUAL\"\r\n}",
+							"raw": "{\r\n    \"customer_id\": 1255,\r\n    \"customer_name\": \"Amit\",\r\n    \"customer_type\": \"INDIVIDUAL\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -198,15 +197,6 @@
 							"originalRequest": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
 									"raw": "http://localhost:8080/customers",
 									"protocol": "http",
@@ -259,7 +249,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/customers/123",
+							"raw": "http://localhost:8080/customers/1249",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -267,7 +257,7 @@
 							"port": "8080",
 							"path": [
 								"customers",
-								"123"
+								"1249"
 							]
 						},
 						"description": "Get customer by customer_id passed in path variable."
@@ -278,15 +268,6 @@
 							"originalRequest": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
 									"raw": "http://localhost:8080/customers/123",
 									"protocol": "http",
@@ -673,6 +654,86 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
+									"raw": "{\r\n    \"amount\": 4500\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/accounts/51691863/withdraw",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"accounts",
+										"51691863",
+										"withdraw"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 20 Dec 2022 15:19:22 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "146"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"timeElapsed\": 9223372036854,\n    \"hasErrorResponse\": false,\n    \"bank_account\": {\n        \"customer_id\": 123,\n        \"account_id\": 51691852,\n        \"balance\": 10000.5\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Withdraw from FD account",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"amount\": 100\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/accounts/51691852/withdraw",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"accounts",
+								"51691852",
+								"withdraw"
+							]
+						},
+						"description": "Withdraw from the account passed in path variable and display the balance in response."
+					},
+					"response": [
+						{
+							"name": "Withdraw from account",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
 									"raw": "{\r\n   \"amount\": 100\r\n}",
 									"options": {
 										"raw": {
@@ -752,15 +813,6 @@
 							"originalRequest": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
 									"raw": "http://localhost:8080/accounts",
 									"protocol": "http",
@@ -832,15 +884,6 @@
 							"originalRequest": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
 									"raw": "http://localhost:8080/accounts/51691852",
 									"protocol": "http",
@@ -875,6 +918,82 @@
 							"body": "{\n    \"statusCode\": 200,\n    \"hasErrorResponse\": false,\n    \"bank_accounts\": [\n        {\n            \"customer_id\": 123,\n            \"account_id\": 51691852,\n            \"account_type\": \"SAVINGS\",\n            \"balance\": 10000.5,\n            \"created_at\": \"2022-12-20T10:17:31Z\",\n            \"updated_at\": \"2022-12-20T10:17:31Z\",\n            \"is_active\": true\n        }\n    ]\n}"
 						}
 					]
+				},
+				{
+					"name": "Get all accounts for customer",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/accounts/customer/234/getallaccounts",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"accounts",
+								"customer",
+								"234",
+								"getallaccounts"
+							]
+						},
+						"description": "Get all accounts for a customer. A customer can have more than one FD account."
+					},
+					"response": [
+						{
+							"name": "Get all accounts for customer",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/accounts/customer/234/getallaccounts",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"accounts",
+										"customer",
+										"234",
+										"getallaccounts"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 20 Dec 2022 15:35:12 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "773"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"timeElapsed\": 16,\n    \"hasErrorResponse\": false,\n    \"bank_accounts\": [\n        {\n            \"customer_id\": 234,\n            \"account_id\": 51691853,\n            \"account_type\": \"SAVINGS\",\n            \"balance\": 20000,\n            \"created_at\": \"2022-12-20T10:26:59Z\",\n            \"updated_at\": \"2022-12-20T10:26:59Z\",\n            \"is_active\": true\n        },\n        {\n            \"customer_id\": 234,\n            \"account_id\": 51691856,\n            \"account_type\": \"FIXED\",\n            \"balance\": 20000,\n            \"created_at\": \"2022-12-20T10:34:35Z\",\n            \"updated_at\": \"2022-12-20T10:34:35Z\",\n            \"lock_period_fd\": 2,\n            \"is_locked\": true,\n            \"is_active\": true,\n            \"penalty_fd\": 0.1,\n            \"locked_until\": \"2024-12-20T15:34:36Z\"\n        },\n        {\n            \"customer_id\": 234,\n            \"account_id\": 51691857,\n            \"account_type\": \"FIXED\",\n            \"balance\": 100000,\n            \"created_at\": \"2022-12-20T10:32:23Z\",\n            \"updated_at\": \"2022-12-20T10:32:23Z\",\n            \"lock_period_fd\": 1,\n            \"is_locked\": true,\n            \"is_active\": true,\n            \"penalty_fd\": 0.1,\n            \"locked_until\": \"2023-12-20T15:32:23Z\"\n        }\n    ]\n}"
+						}
+					]
 				}
 			],
 			"description": "APIs for managing bank accounts for different customers."
@@ -889,7 +1008,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n   \"amount\": 500001\r\n}",
+							"raw": "{\r\n   \"amount\": 50001,\r\n   \"account_pan\": \"ASHJK1653E\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -897,7 +1016,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/accounts/51691852/deposit",
+							"raw": "http://localhost:8080/accounts/5169201/deposit",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -905,7 +1024,7 @@
 							"port": "8080",
 							"path": [
 								"accounts",
-								"51691852",
+								"5169201",
 								"deposit"
 							]
 						},
@@ -959,6 +1078,466 @@
 							],
 							"cookie": [],
 							"body": "{\n    \"statusCode\": 400,\n    \"timeElapsed\": 43243,\n    \"hasErrorResponse\": true,\n    \"errorResponse\": [\n        {\n            \"errorMessage\": \"Error 1644 (46000): Pan number is mandatory for depositing more than 50000.\",\n            \"errorCode\": \"1014\"\n        }\n    ]\n}"
+						},
+						{
+							"name": "Deposit into savings account more than 50K",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n   \"amount\": 50001,\r\n   \"account_pan\": \"ASHJK1653E\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/accounts/5169201/deposit",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"accounts",
+										"5169201",
+										"deposit"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 04 Jan 2023 11:56:29 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "172"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"timeElapsed\": 9223372036854,\n    \"hasErrorResponse\": false,\n    \"bank_account\": {\n        \"customer_id\": 1255,\n        \"account_id\": 5169201,\n        \"balance\": 150001,\n        \"account_pan\": \"ASHJK1653E\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Create SAVINGS Account",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"customer_id\": 1255,\r\n    \"account_id\": 5169201,\r\n    \"account_type\": \"SAVINGS\",\r\n    \"balance\": 100000\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/account",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"account"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Create SAVINGS Account",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"customer_id\": 1255,\r\n    \"account_id\": 5169201,\r\n    \"account_type\": \"SAVINGS\",\r\n    \"balance\": 100000\r\n}"
+								},
+								"url": {
+									"raw": "http://localhost:8080/account",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"account"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 04 Jan 2023 11:53:48 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "170"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"timeElapsed\": 9223372036854,\n    \"hasErrorResponse\": false,\n    \"bank_account\": {\n        \"customer_id\": 1255,\n        \"account_id\": 5169201,\n        \"account_type\": \"SAVINGS\",\n        \"balance\": 100000\n    }\n}"
+						}
+					]
+				}
+			],
+			"description": "APIs for scenarios specific to saving accounts."
+		},
+		{
+			"name": "Accounts - Current",
+			"item": [
+				{
+					"name": "Create CURRENT Account",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"customer_id\": 1256,\r\n    \"account_id\": 5169202,\r\n    \"account_type\": \"CURRENT\",\r\n    \"balance\": 350000,\r\n    \"odallowed\": true,\r\n    \"odamount\": 3500\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/account",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"account"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Create CURRENT Account Sucess",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"customer_id\": 1256,\r\n    \"account_id\": 5169202,\r\n    \"account_type\": \"CURRENT\",\r\n    \"balance\": 350000,\r\n    \"odallowed\": true,\r\n    \"odamount\": 3500\r\n}"
+								},
+								"url": {
+									"raw": "http://localhost:8080/account",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"account"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 04 Jan 2023 12:04:26 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "203"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"timeElapsed\": 9223372036854,\n    \"hasErrorResponse\": false,\n    \"bank_account\": {\n        \"customer_id\": 1256,\n        \"account_id\": 5169202,\n        \"account_type\": \"CURRENT\",\n        \"balance\": 350000,\n        \"odallowed\": true,\n        \"odamount\": 3500\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Deposit in CURRENT Account",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"amount\": 3500\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/accounts/5169202/deposit",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"accounts",
+								"5169202",
+								"deposit"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Deposit in CURRENT Account",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"amount\": 3500\r\n}"
+								},
+								"url": {
+									"raw": "http://localhost:8080/accounts/5169202/deposit",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"accounts",
+										"5169202",
+										"deposit"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 04 Jan 2023 12:17:33 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "145"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"timeElapsed\": 9223372036854,\n    \"hasErrorResponse\": false,\n    \"bank_account\": {\n        \"customer_id\": 1256,\n        \"account_id\": 5169202,\n        \"balance\": 353300\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Err: Deposit in CURRENT Account",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"amount\": 250001\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/accounts/5169202/deposit",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"accounts",
+								"5169202",
+								"deposit"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Err: Deposit in CURRENT Account",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"amount\": 250001\r\n}"
+								},
+								"url": {
+									"raw": "http://localhost:8080/accounts/5169202/deposit",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"accounts",
+										"5169202",
+										"deposit"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 04 Jan 2023 12:18:33 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "182"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 400,\n    \"timeElapsed\": 9223372036854,\n    \"hasErrorResponse\": true,\n    \"errorResponse\": [\n        {\n            \"errorMessage\": \"PAN is mandatory to deposit the amount more than 250000\",\n            \"errorCode\": \"1014\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Withdraw from CURRENT Account",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"amount\":100\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/accounts/5169202/withdraw",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"accounts",
+								"5169202",
+								"withdraw"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Withdraw from CURRENT Account",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"amount\":100\r\n}"
+								},
+								"url": {
+									"raw": "http://localhost:8080/accounts/5169202/withdraw",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"accounts",
+										"5169202",
+										"withdraw"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 04 Jan 2023 12:12:01 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "178"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"timeElapsed\": 9223372036854,\n    \"hasErrorResponse\": false,\n    \"bank_account\": {\n        \"customer_id\": 1256,\n        \"account_id\": 5169202,\n        \"balance\": 349800,\n        \"odallowed\": true,\n        \"odamount\": 3500\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Err: Withdraw from CURRENT Account",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"amount\":500000\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/accounts/5169202/withdraw",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"accounts",
+								"5169202",
+								"withdraw"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Err: Withdraw from CURRENT Account",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"amount\":500000\r\n}"
+								},
+								"url": {
+									"raw": "http://localhost:8080/accounts/5169202/withdraw",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"accounts",
+										"5169202",
+										"withdraw"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 04 Jan 2023 12:13:15 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "219"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 400,\n    \"timeElapsed\": 9223372036854,\n    \"hasErrorResponse\": true,\n    \"errorResponse\": [\n        {\n            \"errorMessage\": \"Insufficient fund. Withdraw amount cannot be covered by overdraft amount, please enter again\",\n            \"errorCode\": \"1011\"\n        }\n    ]\n}"
 						}
 					]
 				}
@@ -1201,16 +1780,13 @@
 					]
 				},
 				{
-					"name": "Get all accounts for customer",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
+					"name": "Err: Withdraw from fixed account",
 					"request": {
-						"method": "GET",
+						"method": "PUT",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "",
+							"raw": "{\r\n   \"amount\": 100\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1218,7 +1794,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/accounts/customer/234/getallaccounts",
+							"raw": "http://localhost:8080/accounts/51691204/withdraw",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1226,22 +1802,21 @@
 							"port": "8080",
 							"path": [
 								"accounts",
-								"customer",
-								"234",
-								"getallaccounts"
+								"51691204",
+								"withdraw"
 							]
 						},
-						"description": "Get all accounts for a customer. A customer can have more than one FD account."
+						"description": "Throw error if deposing into fixed account after account was created. Deposit in FD can be done only once while creating the account."
 					},
 					"response": [
 						{
-							"name": "Get all accounts for customer",
+							"name": "Err: Withdraw from fixed account",
 							"originalRequest": {
-								"method": "GET",
+								"method": "PUT",
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "",
+									"raw": "{\r\n   \"amount\": 100\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1249,7 +1824,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:8080/accounts/customer/234/getallaccounts",
+									"raw": "http://localhost:8080/accounts/51691204/withdraw",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -1257,14 +1832,13 @@
 									"port": "8080",
 									"path": [
 										"accounts",
-										"customer",
-										"234",
-										"getallaccounts"
+										"51691204",
+										"withdraw"
 									]
 								}
 							},
-							"status": "OK",
-							"code": 200,
+							"status": "Bad Request",
+							"code": 400,
 							"_postman_previewlanguage": "json",
 							"header": [
 								{
@@ -1273,15 +1847,95 @@
 								},
 								{
 									"key": "Date",
-									"value": "Tue, 20 Dec 2022 15:35:12 GMT"
+									"value": "Wed, 04 Jan 2023 12:23:39 GMT"
 								},
 								{
 									"key": "Content-Length",
-									"value": "773"
+									"value": "283"
 								}
 							],
 							"cookie": [],
-							"body": "{\n    \"statusCode\": 200,\n    \"timeElapsed\": 16,\n    \"hasErrorResponse\": false,\n    \"bank_accounts\": [\n        {\n            \"customer_id\": 234,\n            \"account_id\": 51691853,\n            \"account_type\": \"SAVINGS\",\n            \"balance\": 20000,\n            \"created_at\": \"2022-12-20T10:26:59Z\",\n            \"updated_at\": \"2022-12-20T10:26:59Z\",\n            \"is_active\": true\n        },\n        {\n            \"customer_id\": 234,\n            \"account_id\": 51691856,\n            \"account_type\": \"FIXED\",\n            \"balance\": 20000,\n            \"created_at\": \"2022-12-20T10:34:35Z\",\n            \"updated_at\": \"2022-12-20T10:34:35Z\",\n            \"lock_period_fd\": 2,\n            \"is_locked\": true,\n            \"is_active\": true,\n            \"penalty_fd\": 0.1,\n            \"locked_until\": \"2024-12-20T15:34:36Z\"\n        },\n        {\n            \"customer_id\": 234,\n            \"account_id\": 51691857,\n            \"account_type\": \"FIXED\",\n            \"balance\": 100000,\n            \"created_at\": \"2022-12-20T10:32:23Z\",\n            \"updated_at\": \"2022-12-20T10:32:23Z\",\n            \"lock_period_fd\": 1,\n            \"is_locked\": true,\n            \"is_active\": true,\n            \"penalty_fd\": 0.1,\n            \"locked_until\": \"2023-12-20T15:32:23Z\"\n        }\n    ]\n}"
+							"body": "{\n    \"statusCode\": 400,\n    \"timeElapsed\": 231871,\n    \"hasErrorResponse\": true,\n    \"errorResponse\": [\n        {\n            \"errorMessage\": \"Locking period of your FD is still not complete. You need to pass preMatureWithdrawal as true to withdraw. Penalty will be applied in case of premature withdrawal.\",\n            \"errorCode\": \"1011\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Err2: Withdraw from fixed account",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"amount\": 100,\r\n   \"preMatureWithdrawal\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/accounts/51691204/withdraw",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"accounts",
+								"51691204",
+								"withdraw"
+							]
+						},
+						"description": "Throw error if deposing into fixed account after account was created. Deposit in FD can be done only once while creating the account."
+					},
+					"response": [
+						{
+							"name": "Err2: Withdraw from fixed account",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n   \"amount\": 100,\r\n   \"preMatureWithdrawal\": true\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/accounts/51691204/withdraw",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"accounts",
+										"51691204",
+										"withdraw"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 04 Jan 2023 12:25:19 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "263"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 400,\n    \"timeElapsed\": 332045,\n    \"hasErrorResponse\": true,\n    \"errorResponse\": [\n        {\n            \"errorMessage\": \"All amount has to be withdrawn from FD account. Your account balance is 100000.000000. Penalty will be applied in case of premature withdrawal.\",\n            \"errorCode\": \"1011\"\n        }\n    ]\n}"
 						}
 					]
 				}
