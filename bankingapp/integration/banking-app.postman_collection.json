@@ -1,9 +1,10 @@
 {
 	"info": {
-		"_postman_id": "3c3d96e4-e171-4cdc-b9f5-889a99f30647",
+		"_postman_id": "8f115c99-b44c-4ef1-a44d-7bcd4f2e1c59",
 		"name": "banking-app",
 		"description": "Golang API for a banking application. It describes create/view a customer, open a bank account for a customer, withdraw money from bank account, deposit money to bank account, view balance for any account, view all the fixed accounts for a customer etc.",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "24956210"
 	},
 	"item": [
 		{
@@ -1806,7 +1807,7 @@
 								"withdraw"
 							]
 						},
-						"description": "Throw error if deposing into fixed account after account was created. Deposit in FD can be done only once while creating the account."
+						"description": "Throw error if withdrawing before maturity date from fixed account."
 					},
 					"response": [
 						{
@@ -1886,7 +1887,7 @@
 								"withdraw"
 							]
 						},
-						"description": "Throw error if deposing into fixed account after account was created. Deposit in FD can be done only once while creating the account."
+						"description": "Throw error if withdrawing less amount than deposted from fixed account. All amount has to be withdrawn from FD."
 					},
 					"response": [
 						{

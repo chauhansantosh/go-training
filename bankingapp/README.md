@@ -1,7 +1,20 @@
 # Project: banking-app
 Golang API for a banking application. It describes create/view a customer, open a bank account for a customer, withdraw money from bank account, deposit money to bank account, view balance for any account, view all the fixed accounts for a customer etc.
-# 📁 Collection: Customer 
 
+# Getting started with the project
+
+## Prerequisite:
+
+1. [Go](https://go.dev) should be installed.
+1. [MySQL](https://dev.mysql.com/downloads/mysql/) should be installed. You can download community version from mysql website.
+
+Please follow the steps bellow to run this project.
+
+1. Execute sql statements provided in [ddl.sql](https://github.com/chauhansantosh/go-training/blob/dev/bankingapp/util/ddl.sql "ddl").
+1. Execute ```go run main.go``` in the directory containing main.go file.
+
+
+# 📁 Collection: Customer 
 
 ## End-point: Create customer success
 Create cutomer successfully for the given paylod.
@@ -853,7 +866,7 @@ Throw error if deposing into fixed account after account was created. Deposit in
 ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
 
 ## End-point: Err: Withdraw from fixed account
-Throw error if deposing into fixed account after account was created. Deposit in FD can be done only once while creating the account.
+Throw error if withdrawing before maturity date from fixed account.
 ### Method: PUT
 >```
 >http://localhost:8080/accounts/51691204/withdraw
@@ -885,7 +898,7 @@ Throw error if deposing into fixed account after account was created. Deposit in
 ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
 
 ## End-point: Err2: Withdraw from fixed account
-Throw error if deposing into fixed account after account was created. Deposit in FD can be done only once while creating the account.
+Throw error if withdrawing less amount than deposted from fixed account. All amount has to be withdrawn from FD.
 ### Method: PUT
 >```
 >http://localhost:8080/accounts/51691204/withdraw
