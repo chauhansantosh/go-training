@@ -14,18 +14,20 @@ type BankAccountInterface interface {
 }
 
 type BankAccount struct {
-	CustomerId     int64     `json:"customer_id,omitempty" validate:"required"`
-	AccountId      int64     `json:"account_id,omitempty" validate:"required"`
-	AccountType    string    `json:"account_type,omitempty" validate:"required,oneof=SAVINGS CURRENT FIXED"`
-	OpeningBalance float64   `json:"balance,omitempty" validate:"required,min=1"`
-	CreatedAt      *time.Time `json:"created_at,omitempty"`
-	UpdatedAt      *time.Time `json:"updated_at,omitempty"`
-	AccountPan     string    `json:"account_pan,omitempty"`
-	LockPeriodFd   int       `json:"lock_period_fd,omitempty" validate:"required_if=AccountType FIXED"`
-	IsLocked       bool      `json:"is_locked,omitempty"`
-	IsActive       bool      `json:"is_active,omitempty"`
-	PenaltyFd      float32   `json:"penalty_fd,omitempty"`
-	LockedUntil    *time.Time `json:"locked_until,omitempty"`
+	CustomerId       int64      `json:"customer_id,omitempty" validate:"required"`
+	AccountId        int64      `json:"account_id,omitempty" validate:"required"`
+	AccountType      string     `json:"account_type,omitempty" validate:"required,oneof=SAVINGS CURRENT FIXED"`
+	OpeningBalance   float64    `json:"balance" validate:"required,min=1"`
+	CreatedAt        *time.Time `json:"created_at,omitempty"`
+	UpdatedAt        *time.Time `json:"updated_at,omitempty"`
+	AccountPan       string     `json:"account_pan,omitempty"`
+	LockPeriodFd     int        `json:"lock_period_fd,omitempty" validate:"required_if=AccountType FIXED"`
+	IsLocked         bool       `json:"is_locked,omitempty"`
+	IsActive         bool       `json:"is_active,omitempty"`
+	PenaltyFd        float64    `json:"penalty_fd,omitempty"`
+	LockedUntil      *time.Time `json:"locked_until,omitempty"`
+	OverdraftAllowed bool       `json:"odallowed,omitempty"`
+	OdAmount         float64    `json:"odamount,omitempty"`
 }
 
 type ErrorResponse struct {
@@ -50,8 +52,9 @@ type AccountResponse struct {
 }
 
 type TransactionRequest struct {
-	Amount     float64 `json:"amount" validate:"required,min=1"`
-	AccountPan string  `json:"account_pan,omitempty"`
+	Amount              float64 `json:"amount" validate:"required,min=1"`
+	AccountPan          string  `json:"account_pan,omitempty"`
+	PreMatureWithdrawal bool    `json:preMatureWithdrawal`
 }
 
 func (account *BankAccount) Init(customerId int64, accountId int64, accountType string, openingBalance float64) {
