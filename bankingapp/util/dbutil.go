@@ -114,7 +114,7 @@ func InsertBankAccount(a bankaccount.BankAccount) error {
 		return err
 	}
 	defer stmt.Close()
-	var penaltyFd float32
+	var penaltyFd float64
 	if a.AccountType == "FIXED" {
 		lockedUntil := time.Now().AddDate(a.LockPeriodFd, 0, 0)
 		a.IsLocked = true

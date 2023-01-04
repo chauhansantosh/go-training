@@ -213,7 +213,7 @@ func Withdraw(ctx *gin.Context) {
 	var fdPenalty float64
 	var lockedUntil string
 	if err = tx.QueryRowContext(ctx, `SELECT (balance >= ?), balance, customer_id, account_type, is_active, 
-	IFNULL(lock_period_fd, ''), penalty_fd, IFNULL(locked_until, ''), (odallowed=true), odamount 
+	IFNULL(lock_period_fd, ''), penalty_fd, IFNULL(locked_until, ''), odallowed, odamount 
 	from bankdb.bank_account where account_id = ?`,
 		withdrawAmount, accountId).Scan(&enough, &openingBalance, &customerId,
 		&accType, &isAccActive, &lockPeriodFD, &fdPenalty, &lockedUntil, &overdraftallowed, &overdraftamount); err != nil {
@@ -246,7 +246,7 @@ func Withdraw(ctx *gin.Context) {
 		//fdMaturityDate := t.Format(layout)
 
 		if currentDate.Before(t) && !preMatureWithdrawal {
-			fail(fmt.Errorf("Locking period of your FD is still not complete."))
+			fail(fmt.Errorf("Locking period of your FD is still not complete. You need to pass preMatureWithdrawal as true to withdraw. Penalty will be applied in case of premature withdrawal."))
 			return
 		} else {
 			if preMatureWithdrawal && withdrawAmount == openingBalance {
@@ -254,7 +254,7 @@ func Withdraw(ctx *gin.Context) {
 				withdrawAmount = openingBalance - penalty
 				newBalance = 0
 			} else if withdrawAmount != openingBalance {
-				fail(fmt.Errorf("All amount has to be withdrawn from FD account. Your account balance is ", openingBalance))
+				fail(fmt.Errorf("All amount has to be withdrawn from FD account. Your account balance is %f. Penalty will be applied in case of premature withdrawal.", openingBalance))
 				return
 			}
 			// close the FD a/c by withdrawing entire amount
