@@ -188,7 +188,7 @@ func Withdraw(ctx *gin.Context) {
 
 	// Create a function for preparing failure results.
 	fail := func(err error) {
-		fmt.Printf("Deposit error: %v", err)
+		fmt.Printf("Withdraw error: %v", err)
 		errorResponse := constructErrorResponse(err.Error(), "1011", errorRespList)
 		constructResponse(http.StatusBadRequest, true, &errorResponse, ctx, nil)
 	}
@@ -203,20 +203,20 @@ func Withdraw(ctx *gin.Context) {
 	defer tx.Rollback()
 
 	// Confirm that account have enough funds.
-	var enough bool
-	var openingBalance float64
+	var enough, overdraftallowed bool
+	var openingBalance, overdraftamount, newBalance, newOdAmount float64
 	var customerId int64
 	//changes for fixed a/c withdrawl
 	var accType string
 	var isAccActive int
 	var lockPeriodFD string
-	var fdPenalty float32
+	var fdPenalty float64
 	var lockedUntil string
 	if err = tx.QueryRowContext(ctx, `SELECT (balance >= ?), balance, customer_id, account_type, is_active, 
-	IFNULL(lock_period_fd, ''), penalty_fd, IFNULL(locked_until, '')
+	IFNULL(lock_period_fd, ''), penalty_fd, IFNULL(locked_until, ''), (odallowed=true), odamount 
 	from bankdb.bank_account where account_id = ?`,
 		withdrawAmount, accountId).Scan(&enough, &openingBalance, &customerId,
-		&accType, &isAccActive, &lockPeriodFD, &fdPenalty, &lockedUntil); err != nil {
+		&accType, &isAccActive, &lockPeriodFD, &fdPenalty, &lockedUntil, &overdraftallowed, &overdraftamount); err != nil {
 
 		if err == sql.ErrNoRows {
 			fail(errors.New("No account found"))
@@ -226,12 +226,13 @@ func Withdraw(ctx *gin.Context) {
 		return
 	}
 
-	if !enough {
+	if !enough && !overdraftallowed {
 		fail(errors.New("Insufficient fund. Please enter again"))
 		return
+	} else if !enough && overdraftallowed && (overdraftamount+openingBalance) < withdrawAmount {
+		fail(errors.New("Insufficient fund. Withdraw amount cannot be covered by overdraft amount, please enter again"))
+		return
 	}
-
-	newBalance := openingBalance - withdrawAmount
 
 	if accType == "FIXED" {
 		//calculate FD maturity date
@@ -249,7 +250,7 @@ func Withdraw(ctx *gin.Context) {
 			return
 		} else {
 			if preMatureWithdrawal && withdrawAmount == openingBalance {
-				penalty := openingBalance * 0.1
+				penalty := openingBalance * (fdPenalty / 100)
 				withdrawAmount = openingBalance - penalty
 				newBalance = 0
 			} else if withdrawAmount != openingBalance {
@@ -264,7 +265,7 @@ func Withdraw(ctx *gin.Context) {
 				return
 			}
 		}
-	} else {
+	} else if enough {
 		// Update the account with new balance
 		_, err = tx.ExecContext(ctx, "UPDATE bankdb.bank_account SET balance = balance - ? WHERE account_id = ?",
 			withdrawAmount, accountId)
@@ -272,13 +273,24 @@ func Withdraw(ctx *gin.Context) {
 			fail(err)
 			return
 		}
+		newBalance = openingBalance - withdrawAmount
+	} else if !enough && overdraftallowed && (overdraftamount+openingBalance) >= withdrawAmount {
+		// Update the account with new balance
+		newOdAmount = overdraftamount - (withdrawAmount - openingBalance)
+		_, err = tx.ExecContext(ctx, "UPDATE bankdb.bank_account SET balance = 0, odamount = ? WHERE account_id = ?",
+			newOdAmount, accountId)
+		if err != nil {
+			fail(err)
+			return
+		}
+		newBalance = 0
 	}
 
 	// Create a new row in the transaction table.
 	result, err := tx.ExecContext(ctx, `INSERT INTO 
-	bankdb.transaction(account_id, customer_id,opening_balance, amount, new_balance,transaction_type) 
-	VALUES (?, ?, ?, ?, ?, ?)`,
-		accountId, customerId, openingBalance, withdrawAmount, newBalance, "DEBIT")
+	bankdb.transaction(account_id, customer_id,opening_balance, amount, new_balance, transaction_type, new_odamount) 
+	VALUES (?, ?, ?, ?, ?, ?, ?)`,
+		accountId, customerId, openingBalance, withdrawAmount, newBalance, "DEBIT", newOdAmount)
 	if err != nil {
 		fail(err)
 		return
@@ -296,6 +308,10 @@ func Withdraw(ctx *gin.Context) {
 		return
 	}
 	accountRes.OpeningBalance = newBalance
+	if overdraftallowed {
+		accountRes.OdAmount = newOdAmount
+		accountRes.OverdraftAllowed = overdraftallowed
+	}
 	accountRes.CustomerId = customerId
 	accountRes.AccountId = accountId
 	constructResponse(http.StatusOK, false, nil, ctx, &accountRes)
@@ -360,6 +376,16 @@ func Deposit(ctx *gin.Context) {
 
 	if accountType == "SAVINGS" && depositAmount > 50000 && accountPan == "" {
 		fail(errors.New("PAN is mandatory to deposit the amount more than 50000"))
+		return
+	}
+
+	if accountType == "SAVINGS" && (openingBalance+depositAmount) > 10000000 {
+		fail(errors.New("Balance limit reached. Can not have more than 10 millions in SAVINGS account."))
+		return
+	}
+
+	if accountType == "CURRENT" && depositAmount > 250000 && accountPan == "" {
+		fail(errors.New("PAN is mandatory to deposit the amount more than 250000"))
 		return
 	}
 

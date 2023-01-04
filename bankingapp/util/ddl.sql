@@ -118,3 +118,9 @@ CREATE TABLE IF NOT EXISTS `transaction` (
   CONSTRAINT `fk_account` FOREIGN KEY (`account_id`) REFERENCES `bank_account` (`account_id`),
   CONSTRAINT `fk_customer` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`)
 );
+
+#--------------------Changes in table--------------------
+
+alter table bankdb.bank_account add column odallowed boolean default false;
+alter table bankdb.bank_account add column odamount float unsigned default 0;
+alter table bankdb.transaction add column new_odamount float unsigned default 0 after new_balance;
